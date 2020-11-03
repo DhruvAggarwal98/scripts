@@ -1,6 +1,6 @@
 import pandas as pd
-filename = "/home/daggarwa/RedHat/pac_life/benchmarks.xlsx"
-fileout = open("/home/daggarwa/scripts/out.txt","w+")
+filename = "/home/daggarwa/scripts/automating_rhel_benchmarks/benchmarks.xlsx"
+fileout = open("/home/daggarwa/scripts/automating_rhel_benchmarks/output.txt","w+")
 counter = 0
 with pd.ExcelFile(filename) as xls:
     for sheet_name in xls.sheet_names:
