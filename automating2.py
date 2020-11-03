@@ -13,10 +13,10 @@ with pd.ExcelFile(filename) as xls:
             #print(df.iterrows())
 for index,row in df.iterrows():
     if counter > 2:
-        fileout.write("- name: |\n")
         #print(row["recommendation #"],row["title"],row["description"],row["rationale statement"])
         control_id = row["recommendation #"]
         if type(control_id) == str:
+            fileout.write("- name: |\n")
             title = row["title"]
             desc = row["description"]
             rationale = row["rationale statement"]
