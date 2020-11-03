@@ -1,10 +1,10 @@
 import pandas as pd
-filename = "/home/daggarwa/scripts/automating_rhel_benchmarks/benchmarks_rhel.xlsx"
-fileout = open("/home/daggarwa/scripts/automating_rhel_benchmarks/rhel_playbook.yml","w+")
+filename = "/home/daggarwa/scripts/automating_vmware_benchmarks/benchmarks_vmware.xlsx"
+fileout = open("/home/daggarwa/scripts/automating_vmware_benchmarks/vmware_playbook.yml","w+")
 counter = 0
 with pd.ExcelFile(filename) as xls:
     for sheet_name in xls.sheet_names:
-        if sheet_name == 'Level 1 - Server':
+        if sheet_name == 'Level 1 (L1) - Corporate_Enter':
             df = pd.read_excel(xls, sheet_name=sheet_name,usecols = "B,C,F,G")
 fileout.write("---")
 fileout.write("\n")
@@ -14,7 +14,7 @@ fileout.write("  gather_facts: false")
 fileout.write("\n\n")
 fileout.write("  tasks: \n")
 for index,row in df.iterrows():
-    if counter > 2:
+    if counter > 0:
         control_id = row["recommendation #"]
         if type(control_id) == str:
             fileout.write("  - name: |\n")
