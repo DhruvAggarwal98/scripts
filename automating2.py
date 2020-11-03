@@ -1,6 +1,6 @@
 import pandas as pd
 filename = "/home/daggarwa/RedHat/pac_life/benchmarks.xlsx"
-fileout = open("/home/daggarwa/RedHat/pac_life/out.txt","w+")
+fileout = open("/home/daggarwa/scripts/out.txt","w+")
 # x1_file = pd.ExcelFile(filename)
 # sheet = "level"
 # dfs = pd.read_excel(filename,sheet_name=sheet)
