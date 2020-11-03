@@ -8,23 +8,29 @@ with pd.ExcelFile(filename) as xls:
             df = pd.read_excel(xls, sheet_name=sheet_name,usecols = "B,C,F,G")
 fileout.write("---")
 fileout.write("\n")
+fileout.write("- hosts: localhost")
+fileout.write("\n")
+fileout.write("  gather_facts: false")
+fileout.write("\n\n")
+fileout.write("  tasks: \n")
 for index,row in df.iterrows():
     if counter > 2:
         control_id = row["recommendation #"]
         if type(control_id) == str:
-            fileout.write("- name: |\n")
+            fileout.write("  - name: |\n")
+            fileout.write("      .\n")
             title = row["title"]
             desc = row["description"].replace("\n"," ")
             rationale = row["rationale statement"].replace("\n"," ")
-            fileout.write("    Control-ID: "+control_id)
+            fileout.write("      Control-ID: "+control_id)
             fileout.write("\n")
-            fileout.write("    Title: "+title)
+            fileout.write("      Title: "+title)
             fileout.write("\n")
-            fileout.write("    Description: "+desc)
+            fileout.write("      Description: "+desc)
             fileout.write("\n")
-            fileout.write("    Rationale: "+rationale)
+            fileout.write("      Rationale: "+rationale)
             fileout.write("\n")
-            fileout.write("  module:")
+            fileout.write("      module:")
             fileout.write("\n\n")
         else:
             pass
