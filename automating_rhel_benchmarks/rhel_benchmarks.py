@@ -30,7 +30,7 @@ for index,row in df.iterrows():
             fileout.write("\n")
             fileout.write("      Rationale: "+rationale)
             fileout.write("\n")
-            fileout.write("      module:")
+            fileout.write("    module:")
             fileout.write("\n\n")
         else:
             pass
