@@ -1,3 +1,4 @@
+---
 - name: |
     Control-ID: 1.1.1.1
     Title: Ensure mounting of cramfs filesystems is disabled
@@ -1468,3 +1469,4 @@
     Rationale: Any users assigned to the shadow group would be granted read access to the /etc/shadow file. If attackers can gain read access to the `/etc/shadow` file, they can easily run a password cracking program against the hashed passwords to break them. Other security information that is stored in the `/etc/shadow` file (such as expiration) could also be useful to subvert additional user accounts.
   module:
 
+...
