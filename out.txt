@@ -15,28 +15,8 @@
 - name: |
     Control-ID: 1.1.2
     Title: Ensure /tmp is configured
-    Description: The `/tmp` directory is a world-writable directory used for temporary storage by all users and some applications.
-
-_Notes:_
-- _If an entry for /tmp exists in /etc/fstab it will take precedence over entries in the tmp.mount file._
-- _`tmpfs` can be resized using the size={size} parameter in `/etc/fstab` or on the Options line in the tmp.mount file. If we don't specify the size, it will be half the RAM._
-
-Resize `tmpfs` examples:
-- `/etc/fstab`
-```
- tmpfs /tmp tmpfs rw,noexec,nodev,nosuid,size=2G 0 0
-```
-- `tmp.mount`
-```
- [Mount]
- What=tmpfs
- Where=/tmp
- Type=tmpfs
- Options=mode=1777,strictatime,size=2G,noexec,nodev,nosuid
-```
-    Rationale: Making /tmp its own file system allows an administrator to set the noexec option on the mount, making /tmp useless for an attacker to install executable code. It would also prevent an attacker from establishing a hardlink to a system setuid program and wait for it to be updated. Once the program was updated, the hardlink would be broken and the attacker would have his own copy of the program. If the program happened to have a security vulnerability, the attacker could continue to exploit the known flaw.
-
-This can be accomplished by either mounting tmpfs to /tmp, or creating a separate partition for /tmp.
+    Description: The `/tmp` directory is a world-writable directory used for temporary storage by all users and some applications.  _Notes:_ - _If an entry for /tmp exists in /etc/fstab it will take precedence over entries in the tmp.mount file._ - _`tmpfs` can be resized using the size={size} parameter in `/etc/fstab` or on the Options line in the tmp.mount file. If we don't specify the size, it will be half the RAM._  Resize `tmpfs` examples: - `/etc/fstab` ```  tmpfs /tmp tmpfs rw,noexec,nodev,nosuid,size=2G 0 0 ``` - `tmp.mount` ```  [Mount]  What=tmpfs  Where=/tmp  Type=tmpfs  Options=mode=1777,strictatime,size=2G,noexec,nodev,nosuid ```
+    Rationale: Making /tmp its own file system allows an administrator to set the noexec option on the mount, making /tmp useless for an attacker to install executable code. It would also prevent an attacker from establishing a hardlink to a system setuid program and wait for it to be updated. Once the program was updated, the hardlink would be broken and the attacker would have his own copy of the program. If the program happened to have a security vulnerability, the attacker could continue to exploit the known flaw.  This can be accomplished by either mounting tmpfs to /tmp, or creating a separate partition for /tmp.
   module:
 
 - name: |
@@ -63,43 +43,28 @@ This can be accomplished by either mounting tmpfs to /tmp, or creating a separat
 - name: |
     Control-ID: 1.1.6
     Title: Ensure /dev/shm is configured
-    Description: `/dev/shm` is a traditional shared memory concept. One program will create a memory portion, which other processes (if permitted) can access. Mounting `tmpfs` at `/dev/shm` is handled automatically by systemd.
-
-_Notes:_
-- _An entry for `/dev/shm` in `/etc/fstab` will take precedence._
-- _`tmpfs` can be resized using the size={size} parameter in `/etc/fstab`. If we don't specify the size, it will be half the RAM._
-
-_Resize `tmpfs` example:_
-```
- tmpfs /dev/shm tmpfs defaults,noexec,nodev,nosuid,size=2G 0 0
-```
+    Description: `/dev/shm` is a traditional shared memory concept. One program will create a memory portion, which other processes (if permitted) can access. Mounting `tmpfs` at `/dev/shm` is handled automatically by systemd.  _Notes:_ - _An entry for `/dev/shm` in `/etc/fstab` will take precedence._ - _`tmpfs` can be resized using the size={size} parameter in `/etc/fstab`. If we don't specify the size, it will be half the RAM._  _Resize `tmpfs` example:_ ```  tmpfs /dev/shm tmpfs defaults,noexec,nodev,nosuid,size=2G 0 0 ```
     Rationale: Any user can upload and execute files inside the `/dev/shm` similar to the `/tmp` partition. Configuring `/dev/shm` allows an administrator to set the `noexec` option on the mount, making `/dev/shm` useless for an attacker to install executable code. It would also prevent an attacker from establishing a hardlink to a system setuid program and wait for it to be updated. Once the program was updated, the hardlink would be broken and the attacker would have his own copy of the program. If the program happened to have a security vulnerability, the attacker could continue to exploit the known flaw.
   module:
 
 - name: |
     Control-ID: 1.1.7
     Title: Ensure noexec option set on /dev/shm partition
-    Description: The `noexec` mount option specifies that the filesystem cannot contain executable binaries.
-
-_Note: `/dev/shm` is mounted automatically by systemd. `/dev/shm` needs to be added to `/etc/fstab` to add mount options even though it is already being mounted on boot._
+    Description: The `noexec` mount option specifies that the filesystem cannot contain executable binaries.  _Note: `/dev/shm` is mounted automatically by systemd. `/dev/shm` needs to be added to `/etc/fstab` to add mount options even though it is already being mounted on boot._
     Rationale: Setting this option on a file system prevents users from executing programs from shared memory. This deters users from introducing potentially malicious software on the system.
   module:
 
 - name: |
     Control-ID: 1.1.8
     Title: Ensure nodev option set on /dev/shm partition
-    Description: The `nodev` mount option specifies that the filesystem cannot contain special devices.
-
-_Note: `/dev/shm` is mounted automatically by systemd. `/dev/shm` needs to be added to `/etc/fstab` to add mount options even though it is already being mounted on boot._
+    Description: The `nodev` mount option specifies that the filesystem cannot contain special devices.  _Note: `/dev/shm` is mounted automatically by systemd. `/dev/shm` needs to be added to `/etc/fstab` to add mount options even though it is already being mounted on boot._
     Rationale: Since the `/dev/shm` filesystem is not intended to support devices, set this option to ensure that users cannot attempt to create special devices in `/dev/shm` partitions.
   module:
 
 - name: |
     Control-ID: 1.1.9
     Title: Ensure nosuid option set on /dev/shm partition
-    Description: The `nosuid` mount option specifies that the filesystem cannot contain `setuid` files.
-
-_Note: `/dev/shm` is mounted automatically by systemd. `/dev/shm` needs to be added to `/etc/fstab` to add mount options even though it is already being mounted on boot._
+    Description: The `nosuid` mount option specifies that the filesystem cannot contain `setuid` files.  _Note: `/dev/shm` is mounted automatically by systemd. `/dev/shm` needs to be added to `/etc/fstab` to add mount options even though it is already being mounted on boot._
     Rationale: Setting this option on a file system prevents users from introducing privileged programs onto the system and allowing non-root users to execute them.
   module:
 
@@ -127,9 +92,7 @@ _Note: `/dev/shm` is mounted automatically by systemd. `/dev/shm` needs to be ad
 - name: |
     Control-ID: 1.1.18
     Title: Ensure nodev option set on /home partition
-    Description: The `nodev` mount option specifies that the filesystem cannot contain special devices.
-
-_Note: The actions in this recommendation refer to the `/home` partition, which is the default user partition. If you have created other user partitions, it is recommended that the Remediation and Audit steps be applied to these partitions as well._
+    Description: The `nodev` mount option specifies that the filesystem cannot contain special devices.  _Note: The actions in this recommendation refer to the `/home` partition, which is the default user partition. If you have created other user partitions, it is recommended that the Remediation and Audit steps be applied to these partitions as well._
     Rationale: Since the user partitions are not intended to support devices, set this option to ensure that users cannot attempt to create block or character special devices.
   module:
 
@@ -164,13 +127,7 @@ _Note: The actions in this recommendation refer to the `/home` partition, which 
 - name: |
     Control-ID: 1.1.23
     Title: Disable Automounting
-    Description: `autofs` allows automatic mounting of devices, typically including CD/DVDs and USB drives.
-
-_Notes:_
-- _Additional methods of disabling a service exist. Consult your distribution documentation for appropriate methods._
-- _This control should align with the tolerance of the use of portable drives and optical media in the organization._ 
- - _On a server requiring an admin to manually mount media can be part of defense-in-depth to reduce the risk of unapproved software or information being introduced or proprietary software or information being exfiltrated._ 
- - _If admins commonly use flash drives and Server access has sufficient physical controls, requiring manual mounting may not increase security._
+    Description: `autofs` allows automatic mounting of devices, typically including CD/DVDs and USB drives.  _Notes:_ - _Additional methods of disabling a service exist. Consult your distribution documentation for appropriate methods._ - _This control should align with the tolerance of the use of portable drives and optical media in the organization._   - _On a server requiring an admin to manually mount media can be part of defense-in-depth to reduce the risk of unapproved software or information being introduced or proprietary software or information being exfiltrated._   - _If admins commonly use flash drives and Server access has sufficient physical controls, requiring manual mounting may not increase security._
     Rationale: With automounting enabled anyone with physical access could attach a USB drive or disc and have its contents available in system even if they lacked permissions to mount it themselves.
   module:
 
@@ -178,11 +135,7 @@ _Notes:_
     Control-ID: 1.1.24
     Title: Disable USB Storage
     Description: USB storage provides a means to transfer and store files insuring persistence and availability of the files independent of network connection status. Its popularity and utility has led to USB-based malware being a simple and common means for network infiltration and a first step to establishing a persistent threat within a networked environment.
-    Rationale: Restricting USB access on the system will decrease the physical attack surface for a device and diminish the possible vectors to introduce malware.
-
-_Notes:_
-- _An alternative solution to disabling the usb-storage module may be found in USBGuard._
-- _Use of USBGuard and construction of USB device policies should be done in alignment with site policy._
+    Rationale: Restricting USB access on the system will decrease the physical attack surface for a device and diminish the possible vectors to introduce malware.  _Notes:_ - _An alternative solution to disabling the usb-storage module may be found in USBGuard._ - _Use of USBGuard and construction of USB device policies should be done in alignment with site policy._
   module:
 
 - name: |
@@ -217,81 +170,55 @@ _Notes:_
     Control-ID: 1.3.1
     Title: Ensure sudo is installed
     Description: sudo allows a permitted user to execute a command as the superuser or another user, as specified by the security policy. The invoking user's real (not effective) user ID is used to determine the user name with which to query the security policy.
-    Rationale: sudo supports a plugin architecture for security policies and input/output logging. Third parties can develop and distribute their own policy and I/O logging plugins to work seamlessly with the sudo front end. The default security policy is sudoers, which is configured via the file /etc/sudoers.
-
-The security policy determines what privileges, if any, a user has to run sudo. The policy may require that users authenticate themselves with a password or another authentication mechanism. If authentication is required, sudo will exit if the user's password is not entered within a configurable time limit. This limit is policy-specific.
+    Rationale: sudo supports a plugin architecture for security policies and input/output logging. Third parties can develop and distribute their own policy and I/O logging plugins to work seamlessly with the sudo front end. The default security policy is sudoers, which is configured via the file /etc/sudoers.  The security policy determines what privileges, if any, a user has to run sudo. The policy may require that users authenticate themselves with a password or another authentication mechanism. If authentication is required, sudo will exit if the user's password is not entered within a configurable time limit. This limit is policy-specific.
   module:
 
 - name: |
     Control-ID: 1.3.2
     Title: Ensure sudo commands use pty
-    Description: sudo can be configured to run only from a pseudo-pty
-
-_Note: visudo edits the sudoers file in a safe fashion, analogous to vipw(8). visudo locks the sudoers file against multiple simultaneous edits, provides basic sanity checks, and checks for parse errors. If the sudoers file is currently being edited you will receive a message to try again later. The `-f` option allows you to tell `visudo` which file to edit._
-    Rationale: Attackers can run a malicious program using sudo, which would again fork a background process that remains even when the main program has finished executing.
-
-This can be mitigated by configuring sudo to run other commands only from a pseudo-pty, whether I/O logging is turned on or not.
+    Description: sudo can be configured to run only from a pseudo-pty  _Note: visudo edits the sudoers file in a safe fashion, analogous to vipw(8). visudo locks the sudoers file against multiple simultaneous edits, provides basic sanity checks, and checks for parse errors. If the sudoers file is currently being edited you will receive a message to try again later. The `-f` option allows you to tell `visudo` which file to edit._
+    Rationale: Attackers can run a malicious program using sudo, which would again fork a background process that remains even when the main program has finished executing.  This can be mitigated by configuring sudo to run other commands only from a pseudo-pty, whether I/O logging is turned on or not.
   module:
 
 - name: |
     Control-ID: 1.3.3
     Title: Ensure sudo log file exists
-    Description: sudo can use a custom log file
-
-_Note: visudo edits the sudoers file in a safe fashion, analogous to vipw(8). visudo locks the sudoers file against multiple simultaneous edits, provides basic sanity checks, and checks for parse errors. If the sudoers file is currently being edited you will receive a message to try again later. The `-f` option allows you to tell `visudo` which file to edit._
+    Description: sudo can use a custom log file  _Note: visudo edits the sudoers file in a safe fashion, analogous to vipw(8). visudo locks the sudoers file against multiple simultaneous edits, provides basic sanity checks, and checks for parse errors. If the sudoers file is currently being edited you will receive a message to try again later. The `-f` option allows you to tell `visudo` which file to edit._
     Rationale: A sudo log file simplifies auditing of sudo commands
   module:
 
 - name: |
     Control-ID: 1.4.1
     Title: Ensure AIDE is installed
-    Description: AIDE takes a snapshot of filesystem state including modification times, permissions, and file hashes which can then be used to compare against the current state of the filesystem to detect modifications to the system.
-
-_Note: The prelinking feature can interfere with AIDE because it alters binaries to speed up their start up times. Run prelink -ua to restore the binaries to their prelinked state, thus avoiding false positives from AIDE._
+    Description: AIDE takes a snapshot of filesystem state including modification times, permissions, and file hashes which can then be used to compare against the current state of the filesystem to detect modifications to the system.  _Note: The prelinking feature can interfere with AIDE because it alters binaries to speed up their start up times. Run prelink -ua to restore the binaries to their prelinked state, thus avoiding false positives from AIDE._
     Rationale: By monitoring the filesystem state compromised files can be detected to prevent or limit the exposure of accidental or malicious misconfigurations or modified binaries.
   module:
 
 - name: |
     Control-ID: 1.4.2
     Title: Ensure filesystem integrity is regularly checked
-    Description: Periodic checking of the filesystem integrity is needed to detect changes to the filesystem.
-
-_Note: The checking in this recommendation occurs every day at 5am. Alter the frequency and time of the checks in compliance with site policy._
+    Description: Periodic checking of the filesystem integrity is needed to detect changes to the filesystem.  _Note: The checking in this recommendation occurs every day at 5am. Alter the frequency and time of the checks in compliance with site policy._
     Rationale: Periodic file checking allows the system administrator to determine on a regular basis if critical files have been changed in an unauthorized fashion.
   module:
 
 - name: |
     Control-ID: 1.5.1
     Title: Ensure bootloader password is set
-    Description: Setting the boot loader password will require that anyone rebooting the system must enter a password before being able to set command line boot parameters
-
-_Notes:_
-- _This recommendation is designed around the grub2 bootloader, if LILO or another bootloader is in use in your environment enact equivalent settings. Replace `/boot/grub2/grub.cfg with the appropriate grub configuration file for your environment_
-- _For `older` grub2 based systems:_
- - _The superuser/user information and password should not be contained in the /etc/grub.d/00_header file. The information can be placed in any /etc/grub.d file as long as that file is incorporated into grub.cfg. **The user may prefer to enter this data into a custom file, such as /etc/grub.d/40_custom so it is not overwritten should the Grub package be updated**._ 
- - _If placing the information in a custom file, do not include the "cat << EOF" and "EOF" lines as the content is automatically added from these files._
+    Description: Setting the boot loader password will require that anyone rebooting the system must enter a password before being able to set command line boot parameters  _Notes:_ - _This recommendation is designed around the grub2 bootloader, if LILO or another bootloader is in use in your environment enact equivalent settings. Replace `/boot/grub2/grub.cfg with the appropriate grub configuration file for your environment_ - _For `older` grub2 based systems:_  - _The superuser/user information and password should not be contained in the /etc/grub.d/00_header file. The information can be placed in any /etc/grub.d file as long as that file is incorporated into grub.cfg. **The user may prefer to enter this data into a custom file, such as /etc/grub.d/40_custom so it is not overwritten should the Grub package be updated**._   - _If placing the information in a custom file, do not include the "cat << EOF" and "EOF" lines as the content is automatically added from these files._
     Rationale: Requiring a boot password upon execution of the boot loader will prevent an unauthorized user from entering boot parameters or changing the boot partition. This prevents users from weakening security (e.g. turning off SELinux at boot time).
   module:
 
 - name: |
     Control-ID: 1.5.2
     Title: Ensure permissions on bootloader config are configured
-    Description: The grub configuration file contains information on boot settings and passwords for unlocking boot options. The grub2 configuration is usually `grub.cfg` stored in `/boot/grub2/`. On newer grub2 systems the encrypted bootloader password is contained in `/boot/grub2/user.cfg`.
-
-**Notes:** 
-- This recommendation is designed around the grub2 bootloader.
-- If LILO or another bootloader is in use in your environment:
- - Enact equivalent settings 
- - Replace `/boot/grub2/grub.cfg` and `/boot/grub2/user.cfg` with the appropriate boot configuration files for your environment
+    Description: The grub configuration file contains information on boot settings and passwords for unlocking boot options. The grub2 configuration is usually `grub.cfg` stored in `/boot/grub2/`. On newer grub2 systems the encrypted bootloader password is contained in `/boot/grub2/user.cfg`.  **Notes:**  - This recommendation is designed around the grub2 bootloader. - If LILO or another bootloader is in use in your environment:  - Enact equivalent settings   - Replace `/boot/grub2/grub.cfg` and `/boot/grub2/user.cfg` with the appropriate boot configuration files for your environment
     Rationale: Setting the permissions to read and write for root only prevents non-root users from seeing the boot parameters or changing them. Non-root users who read the boot parameters may be able to identify weaknesses in security upon boot and be able to exploit them.
   module:
 
 - name: |
     Control-ID: 1.5.3
     Title: Ensure authentication required for single user mode
-    Description: Single user mode (rescue mode) is used for recovery when the system detects an issue during boot or by manual selection from the bootloader.
-
-**Note:** The systemctl option `--fail` is synonymous with `--job-mode=fail`. Using either is acceptable.
+    Description: Single user mode (rescue mode) is used for recovery when the system detects an issue during boot or by manual selection from the bootloader.  **Note:** The systemctl option `--fail` is synonymous with `--job-mode=fail`. Using either is acceptable.
     Rationale: Requiring authentication in single user mode (rescue mode) prevents an unauthorized user from rebooting the system into single user to gain root privileges without credentials.
   module:
 
@@ -306,9 +233,7 @@ _Notes:_
     Control-ID: 1.6.2
     Title: Ensure XD/NX support is enabled
     Description: Recent processors in the x86 family support the ability to prevent code execution on a per memory page basis. Generically and on AMD processors, this ability is called No Execute (NX), while on Intel processors it is called Execute Disable (XD). This ability can help prevent exploitation of buffer overflow vulnerabilities and should be activated whenever possible. Extra steps must be taken to ensure that this protection is enabled, particularly on 32-bit x86 systems. Other processors, such as Itanium and POWER, have included such support since inception and the standard kernel for those platforms supports the feature.
-    Rationale: Enabling any feature that can protect against buffer overflow attacks enhances the security of the system.
-
-**Note:** Ensure your system supports the XD or NX bit and has PAE support before implementing this recommendation as this may prevent it from booting if these are not supported by your hardware.
+    Rationale: Enabling any feature that can protect against buffer overflow attacks enhances the security of the system.  **Note:** Ensure your system supports the XD or NX bit and has PAE support before implementing this recommendation as this may prevent it from booting if these are not supported by your hardware.
   module:
 
 - name: |
@@ -335,44 +260,28 @@ _Notes:_
 - name: |
     Control-ID: 1.7.1.2
     Title: Ensure SELinux is not disabled in bootloader configuration
-    Description: Configure SELINUX to be enabled at boot time and verify that it has not been overwritten by the grub boot parameters.
-
-**Note:** This recommendation is designed around the grub 2 bootloader, if LILO or another bootloader is in use in your environment enact equivalent settings.
+    Description: Configure SELINUX to be enabled at boot time and verify that it has not been overwritten by the grub boot parameters.  **Note:** This recommendation is designed around the grub 2 bootloader, if LILO or another bootloader is in use in your environment enact equivalent settings.
     Rationale: SELinux must be enabled at boot time in your grub configuration to ensure that the controls it provides are not overridden.
   module:
 
 - name: |
     Control-ID: 1.7.1.3
     Title: Ensure SELinux policy is configured
-    Description: Configure SELinux to meet or exceed the default targeted policy, which constrains daemons and system software only.
-
-**Note:** If your organization requires stricter policies, ensure that they are set in the `/etc/selinux/config` file.
+    Description: Configure SELinux to meet or exceed the default targeted policy, which constrains daemons and system software only.  **Note:** If your organization requires stricter policies, ensure that they are set in the `/etc/selinux/config` file.
     Rationale: Security configuration requirements vary from site to site. Some sites may mandate a policy that is stricter than the default policy, which is perfectly acceptable. This item is intended to ensure that at least the default recommendations are met.
   module:
 
 - name: |
     Control-ID: 1.7.1.4
     Title: Ensure the SELinux mode is enforcing or permissive
-    Description: SELinux can run in one of three modes: disabled, permissive, or enforcing:
-
-- Enforcing - Is the default, and recommended, mode of operation; in enforcing mode SELinux operates normally, enforcing the loaded security policy on the entire system.
-- Permissive - The system acts as if SELinux is enforcing the loaded security policy, including labeling objects and emitting access denial entries in the logs, but it does not actually deny any operations. While not recommended for production systems, permissive mode can be helpful for SELinux policy development.
-- Disabled - Is strongly discouraged; not only does the system avoid enforcing the SELinux policy, it also avoids labeling any persistent objects such as files, making it difficult to enable SELinux in the future
-
-**Note:** you can set individual domains to permissive mode while the system runs in enforcing mode. For example, to make the httpd_t domain permissive:
-
-```
-# semanage permissive -a httpd_t
-```
+    Description: SELinux can run in one of three modes: disabled, permissive, or enforcing:  - Enforcing - Is the default, and recommended, mode of operation; in enforcing mode SELinux operates normally, enforcing the loaded security policy on the entire system. - Permissive - The system acts as if SELinux is enforcing the loaded security policy, including labeling objects and emitting access denial entries in the logs, but it does not actually deny any operations. While not recommended for production systems, permissive mode can be helpful for SELinux policy development. - Disabled - Is strongly discouraged; not only does the system avoid enforcing the SELinux policy, it also avoids labeling any persistent objects such as files, making it difficult to enable SELinux in the future  **Note:** you can set individual domains to permissive mode while the system runs in enforcing mode. For example, to make the httpd_t domain permissive:  ``` # semanage permissive -a httpd_t ```
     Rationale: Running SELinux in disabled mode is strongly discouraged; not only does the system avoid enforcing the SELinux policy, it also avoids labeling any persistent objects such as files, making it difficult to enable SELinux in the future.
   module:
 
 - name: |
     Control-ID: 1.7.1.6
     Title: Ensure no unconfined services exist
-    Description: Unconfined processes run in unconfined domains
-
-**Note:** Occasionally certain daemons such as backup or centralized management software may require running unconfined. Any such software should be carefully analyzed and documented before such an exception is made.
+    Description: Unconfined processes run in unconfined domains  **Note:** Occasionally certain daemons such as backup or centralized management software may require running unconfined. Any such software should be carefully analyzed and documented before such an exception is made.
     Rationale: For unconfined processes, SELinux policy rules are applied, but policy rules exist that allow processes running in unconfined domains almost all access. Processes running in unconfined domains fall back to using DAC rules exclusively. If an unconfined process is compromised, SELinux does not prevent an attacker from gaining access to system resources and data, but of course, DAC rules are still used. SELinux is a security enhancement on top of DAC rules – it does not replace them
   module:
 
@@ -393,27 +302,21 @@ _Notes:_
 - name: |
     Control-ID: 1.8.1.1
     Title: Ensure message of the day is configured properly
-    Description: The contents of the `/etc/motd` file are displayed to users after login and function as a message of the day for authenticated users.
-
-Unix-based systems have typically displayed information about the OS release and patch level upon logging in to the system. This information can be useful to developers who are developing software for a particular OS platform. If `mingetty(8)` supports the following options, they display operating system information: `\m` - machine architecture `\r` - operating system release `\s` - operating system name `\v` - operating system version
+    Description: The contents of the `/etc/motd` file are displayed to users after login and function as a message of the day for authenticated users.  Unix-based systems have typically displayed information about the OS release and patch level upon logging in to the system. This information can be useful to developers who are developing software for a particular OS platform. If `mingetty(8)` supports the following options, they display operating system information: `\m` - machine architecture `\r` - operating system release `\s` - operating system name `\v` - operating system version
     Rationale: Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organization that owns the system and any monitoring policies that are in place. Displaying OS and patch level information in login banners also has the side effect of providing detailed system information to attackers attempting to target specific exploits of a system. Authorized users can easily get this information by running the " `uname -a` " command once they have logged in.
   module:
 
 - name: |
     Control-ID: 1.8.1.2
     Title: Ensure local login warning banner is configured properly
-    Description: The contents of the `/etc/issue` file are displayed to users prior to login for local terminals.
-
-Unix-based systems have typically displayed information about the OS release and patch level upon logging in to the system. This information can be useful to developers who are developing software for a particular OS platform. If `mingetty(8)` supports the following options, they display operating system information: `\m` - machine architecture `\r` - operating system release `\s` - operating system name `\v` - operating system version - or the operating system's name
+    Description: The contents of the `/etc/issue` file are displayed to users prior to login for local terminals.  Unix-based systems have typically displayed information about the OS release and patch level upon logging in to the system. This information can be useful to developers who are developing software for a particular OS platform. If `mingetty(8)` supports the following options, they display operating system information: `\m` - machine architecture `\r` - operating system release `\s` - operating system name `\v` - operating system version - or the operating system's name
     Rationale: Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organization that owns the system and any monitoring policies that are in place. Displaying OS and patch level information in login banners also has the side effect of providing detailed system information to attackers attempting to target specific exploits of a system. Authorized users can easily get this information by running the " `uname -a` " command once they have logged in.
   module:
 
 - name: |
     Control-ID: 1.8.1.3
     Title: Ensure remote login warning banner is configured properly
-    Description: The contents of the `/etc/issue.net` file are displayed to users prior to login for remote connections from configured services.
-
-Unix-based systems have typically displayed information about the OS release and patch level upon logging in to the system. This information can be useful to developers who are developing software for a particular OS platform. If `mingetty(8)` supports the following options, they display operating system information: `\m` - machine architecture `\r` - operating system release `\s` - operating system name `\v` - operating system version
+    Description: The contents of the `/etc/issue.net` file are displayed to users prior to login for remote connections from configured services.  Unix-based systems have typically displayed information about the OS release and patch level upon logging in to the system. This information can be useful to developers who are developing software for a particular OS platform. If `mingetty(8)` supports the following options, they display operating system information: `\m` - machine architecture `\r` - operating system release `\s` - operating system name `\v` - operating system version
     Rationale: Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organization that owns the system and any monitoring policies that are in place. Displaying OS and patch level information in login banners also has the side effect of providing detailed system information to attackers attempting to target specific exploits of a system. Authorized users can easily get this information by running the " `uname -a` " command once they have logged in.
   module:
 
@@ -441,9 +344,7 @@ Unix-based systems have typically displayed information about the OS release and
 - name: |
     Control-ID: 1.9
     Title: Ensure updates, patches, and additional security software are installed
-    Description: Periodically patches are released for included software either due to security flaws or to include additional functionality.
-
-_Note: Site policy may mandate a testing period before install onto production systems for available updates._
+    Description: Periodically patches are released for included software either due to security flaws or to include additional functionality.  _Note: Site policy may mandate a testing period before install onto production systems for available updates._
     Rationale: Newer patches may contain security enhancements that would not be available through the latest full update. As a result, it is recommended that the latest software patches be used to take advantage of the latest functionality. As with any software installation, organizations need to determine if a given update meets their requirements and verify the compatibility and supportability of any additional software against the update revision that is selected.
   module:
 
@@ -451,25 +352,13 @@ _Note: Site policy may mandate a testing period before install onto production s
     Control-ID: 1.10
     Title: Ensure GDM is removed or login is configured
     Description: GDM is the GNOME Display Manager which handles graphical login for GNOME based systems.
-    Rationale: If a graphical login is not required, it should be removed to reduce the attack surface of the system. If a graphical login is required, last logged in user display should be disabled, and a warning banner should be configured.
-
-displaying the last logged in user eliminates half of the Userid/Password equation that an unauthorized person would need to log on.
-
-Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organization that owns the system and any monitoring policies that are in place.
-
-_Notes:_
-- _Additional options and sections may appear in the `/etc/dconf/db/gdm.d/01-banner-message` file._
-- _If a different GUI login service is in use and required on the system, consult your documentation to disable displaying the last logged on user and apply an equivalent banner._
+    Rationale: If a graphical login is not required, it should be removed to reduce the attack surface of the system. If a graphical login is required, last logged in user display should be disabled, and a warning banner should be configured.  displaying the last logged in user eliminates half of the Userid/Password equation that an unauthorized person would need to log on.  Warning messages inform users who are attempting to login to the system of their legal status regarding the system and must include the name of the organization that owns the system and any monitoring policies that are in place.  _Notes:_ - _Additional options and sections may appear in the `/etc/dconf/db/gdm.d/01-banner-message` file._ - _If a different GUI login service is in use and required on the system, consult your documentation to disable displaying the last logged on user and apply an equivalent banner._
   module:
 
 - name: |
     Control-ID: 2.5
     Title: Ensure nonessential services are removed or masked
-    Description: A network port is identified by its number, the associated IP address, and the type of the communication protocol such as TCP or UDP.
-
-A listening port is a network port on which an application or process listens on, acting as a communication endpoint.
-
-Each listening port can be open or closed (filtered) using a firewall. In general terms, an open port is a network port that accepts incoming packets from remote locations.
+    Description: A network port is identified by its number, the associated IP address, and the type of the communication protocol such as TCP or UDP.  A listening port is a network port on which an application or process listens on, acting as a communication endpoint.  Each listening port can be open or closed (filtered) using a firewall. In general terms, an open port is a network port that accepts incoming packets from remote locations.
     Rationale: Services listening on the system pose a potential risk as an attack vector. These services should be reviewed, and if not required, the service should be stopped, and the package containing the service should be removed. If required packages have a dependency, the service should be stopped and masked to reduce the attack surface of the system.
   module:
 
@@ -477,20 +366,13 @@ Each listening port can be open or closed (filtered) using a firewall. In genera
     Control-ID: 2.1.2
     Title: Ensure xinetd is not installed
     Description: The eXtended InterNET Daemon ( `xinetd` ) is an open source super daemon that replaced the original `inetd` daemon. The `xinetd` daemon listens for well known services and dispatches the appropriate daemon to properly respond to service requests.
-    Rationale: If there are no xinetd services required, it is recommended that the package be removed to reduce the attack surface are of the system.
-
-**Note:** If an xinetd service or services are required, ensure that any xinetd service not required is stopped and disabled
+    Rationale: If there are no xinetd services required, it is recommended that the package be removed to reduce the attack surface are of the system.  **Note:** If an xinetd service or services are required, ensure that any xinetd service not required is stopped and disabled
   module:
 
 - name: |
     Control-ID: 2.2.1.1
     Title: Ensure time synchronization is in use
-    Description: System time should be synchronized between all systems in an environment. This is typically done by establishing an authoritative time server or set of servers and having all systems synchronize their clocks to them.
-
-_Notes:_
-- _On systems where host based time synchronization is not available, verify that chrony _or_ NTP is installed._
-- _On systems where host based time synchronization is available consult your documentation and verify that host based synchronization is in use._
-- _If another method for time synchronization is being used, this section may be skipped._
+    Description: System time should be synchronized between all systems in an environment. This is typically done by establishing an authoritative time server or set of servers and having all systems synchronize their clocks to them.  _Notes:_ - _On systems where host based time synchronization is not available, verify that chrony _or_ NTP is installed._ - _On systems where host based time synchronization is available consult your documentation and verify that host based synchronization is in use._ - _If another method for time synchronization is being used, this section may be skipped._
     Rationale: Time synchronization is important to support time sensitive security mechanisms like Kerberos and also ensures log files have consistent time records across the enterprise, which aids in forensic investigations.
   module:
 
@@ -498,17 +380,13 @@ _Notes:_
     Control-ID: 2.2.1.2
     Title: Ensure chrony is configured
     Description: `chrony` is a daemon which implements the Network Time Protocol (NTP) and is designed to synchronize system clocks across a variety of systems and use a source that is highly accurate. More information on `chrony` can be found at <http://chrony.tuxfamily.org/>. `chrony` can be configured to be a client and/or a server.
-    Rationale: If chrony is in use on the system proper configuration is vital to ensuring time synchronization is working properly.
-
-_Note: This recommendation only applies if chrony is in use on the system._
+    Rationale: If chrony is in use on the system proper configuration is vital to ensuring time synchronization is working properly.  _Note: This recommendation only applies if chrony is in use on the system._
   module:
 
 - name: |
     Control-ID: 2.2.1.3
     Title: Ensure ntp is configured
-    Description: `ntp` is a daemon which implements the Network Time Protocol (NTP). It is designed to synchronize system clocks across a variety of systems and use a source that is highly accurate. More information on NTP can be found at [http://www.ntp.org](http://www.ntp.org/). `ntp` can be configured to be a client and/or a server.
-
-_Note: This recommendation only applies if ntp is in use on the system._
+    Description: `ntp` is a daemon which implements the Network Time Protocol (NTP). It is designed to synchronize system clocks across a variety of systems and use a source that is highly accurate. More information on NTP can be found at [http://www.ntp.org](http://www.ntp.org/). `ntp` can be configured to be a client and/or a server.  _Note: This recommendation only applies if ntp is in use on the system._
     Rationale: If ntp is in use on the system proper configuration is vital to ensuring time synchronization is working properly.
   module:
 
@@ -530,9 +408,7 @@ _Note: This recommendation only applies if ntp is in use on the system._
     Control-ID: 2.2.4
     Title: Ensure CUPS is not installed
     Description: The Common Unix Print System (CUPS) provides the ability to print to both local and network printers. A system running CUPS can also accept print jobs from remote systems and print them to local printers. It also provides a web based remote administration capability.
-    Rationale: If the system does not need to print jobs or accept print jobs from other systems, it is recommended that CUPS be removed to reduce the potential attack surface.
-
-_Note: Removing CUPS will prevent printing from the system_
+    Rationale: If the system does not need to print jobs or accept print jobs from other systems, it is recommended that CUPS be removed to reduce the potential attack surface.  _Note: Removing CUPS will prevent printing from the system_
   module:
 
 - name: |
@@ -553,20 +429,14 @@ _Note: Removing CUPS will prevent printing from the system_
     Control-ID: 2.2.7
     Title: Ensure nfs-utils is not installed or the  nfs-server service is masked
     Description: The Network File System (NFS) is one of the first and most widely distributed file systems in the UNIX environment. It provides the ability for systems to mount file systems of other servers through the network.
-    Rationale: If the system does not require network shares, it is recommended that the nfs-utils package be removed to reduce the attack surface of the system.
-
-_Note: many of the libvirt packages used by Enterprise Linux virtualization are dependent on the nfs-utils package. If the nfs-package is required as a dependency, the nfs-server should be disabled and masked to reduce the attack surface of the system._
+    Rationale: If the system does not require network shares, it is recommended that the nfs-utils package be removed to reduce the attack surface of the system.  _Note: many of the libvirt packages used by Enterprise Linux virtualization are dependent on the nfs-utils package. If the nfs-package is required as a dependency, the nfs-server should be disabled and masked to reduce the attack surface of the system._
   module:
 
 - name: |
     Control-ID: 2.2.8
     Title: Ensure rpcbind is not installed or the  rpcbind services are masked
-    Description: The rpcbind utility maps RPC services to the ports on which they listen. RPC processes notify rpcbind when they start, registering the ports they are listening on and the RPC program numbers they expect to serve. The client system then contacts rpcbind on the server with a particular RPC program number. The rpcbind service redirects the client to the proper port number so it can communicate with the requested service
-
-Portmapper is an RPC service, which always listens on tcp and udp 111, and is used to map other RPC services (such as nfs, nlockmgr, quotad, mountd, etc.) to their corresponding port number on the server. When a remote host makes an RPC call to that server, it first consults with portmap to determine where the RPC server is listening.
-    Rationale: A small request (~82 bytes via UDP) sent to the Portmapper generates a large response (7x to 28x amplification), which makes it a suitable tool for DDoS attacks. If rpcbind is not required, it is recommended that the rpcbind package be removed to reduce the attack surface of the system.
-
-_Note: many of the libvirt packages used by Enterprise Linux virtualization, and the nfs-utils package used for The Network File System (NFS) are dependent on the rpcbind package. If the rpcbind is required as a dependency, the services rpcbind.service and rpcbind.socket should be stopped and masked to reduce the attack surface of the system._
+    Description: The rpcbind utility maps RPC services to the ports on which they listen. RPC processes notify rpcbind when they start, registering the ports they are listening on and the RPC program numbers they expect to serve. The client system then contacts rpcbind on the server with a particular RPC program number. The rpcbind service redirects the client to the proper port number so it can communicate with the requested service  Portmapper is an RPC service, which always listens on tcp and udp 111, and is used to map other RPC services (such as nfs, nlockmgr, quotad, mountd, etc.) to their corresponding port number on the server. When a remote host makes an RPC call to that server, it first consults with portmap to determine where the RPC server is listening.
+    Rationale: A small request (~82 bytes via UDP) sent to the Portmapper generates a large response (7x to 28x amplification), which makes it a suitable tool for DDoS attacks. If rpcbind is not required, it is recommended that the rpcbind package be removed to reduce the attack surface of the system.  _Note: many of the libvirt packages used by Enterprise Linux virtualization, and the nfs-utils package used for The Network File System (NFS) are dependent on the rpcbind package. If the rpcbind is required as a dependency, the services rpcbind.service and rpcbind.socket should be stopped and masked to reduce the attack surface of the system._
   module:
 
 - name: |
@@ -580,31 +450,21 @@ _Note: many of the libvirt packages used by Enterprise Linux virtualization, and
     Control-ID: 2.2.10
     Title: Ensure FTP Server is not installed
     Description: FTP (File Transfer Protocol) is a traditional and widely used standard tool for transferring files between a server and clients over a network, especially where no authentication is necessary (permits anonymous users to connect to a server).
-    Rationale: FTP does not protect the confidentiality of data or authentication credentials. It is recommended SFTP be used if file transfer is required. Unless there is a need to run the system as a FTP server (for example, to allow anonymous downloads), it is recommended that the package be removed to reduce the potential attack surface.
-
-**Note:** Additional FTP servers also exist and should be removed if not required.
+    Rationale: FTP does not protect the confidentiality of data or authentication credentials. It is recommended SFTP be used if file transfer is required. Unless there is a need to run the system as a FTP server (for example, to allow anonymous downloads), it is recommended that the package be removed to reduce the potential attack surface.  **Note:** Additional FTP servers also exist and should be removed if not required.
   module:
 
 - name: |
     Control-ID: 2.2.11
     Title: Ensure HTTP server is not installed
     Description: HTTP or web servers provide the ability to host web site content.
-    Rationale: Unless there is a need to run the system as a web server, it is recommended that the package be removed to reduce the potential attack surface.
-
-_Notes:_
-- _Several http servers exist. `apache`, `apache2`, `lighttpd`, and `nginx` are example packages that provide an HTTP server._ 
-- _These and other packages should also be audited, and removed if not required._
+    Rationale: Unless there is a need to run the system as a web server, it is recommended that the package be removed to reduce the potential attack surface.  _Notes:_ - _Several http servers exist. `apache`, `apache2`, `lighttpd`, and `nginx` are example packages that provide an HTTP server._  - _These and other packages should also be audited, and removed if not required._
   module:
 
 - name: |
     Control-ID: 2.2.12
     Title: Ensure IMAP and POP3 server is not installed
     Description: `dovecot` is an open source IMAP and POP3 server for Linux based systems.
-    Rationale: Unless POP3 and/or IMAP servers are to be provided by this system, it is recommended that the package be removed to reduce the potential attack surface.
-
-_Notes:_
-- _Several IMAP/POP3 servers exist and can use other service names. `courier-imap` and `cyrus-imap` are example services that provide a mail server. _
-- _These and other services should also be audited and the packages removed if not required._
+    Rationale: Unless POP3 and/or IMAP servers are to be provided by this system, it is recommended that the package be removed to reduce the potential attack surface.  _Notes:_ - _Several IMAP/POP3 servers exist and can use other service names. `courier-imap` and `cyrus-imap` are example services that provide a mail server. _ - _These and other services should also be audited and the packages removed if not required._
   module:
 
 - name: |
@@ -618,48 +478,28 @@ _Notes:_
     Control-ID: 2.2.14
     Title: Ensure HTTP Proxy Server is not installed
     Description: Squid is a standard proxy server used in many distributions and environments.
-    Rationale: Unless a system is specifically set up to act as a proxy server, it is recommended that the squid package be removed to reduce the potential attack surface.
-
-**Note:** Several HTTP proxy servers exist. These should be checked and removed unless required.
+    Rationale: Unless a system is specifically set up to act as a proxy server, it is recommended that the squid package be removed to reduce the potential attack surface.  **Note:** Several HTTP proxy servers exist. These should be checked and removed unless required.
   module:
 
 - name: |
     Control-ID: 2.2.15
     Title: Ensure net-snmp is not installed
-    Description: Simple Network Management Protocol (SNMP) is a widely used protocol for monitoring the health and welfare of network equipment, computer equipment and devices like UPSs. 
-
-Net-SNMP is a suite of applications used to implement SNMPv1 (RFC 1157), SNMPv2 (RFCs 1901-1908), and SNMPv3 (RFCs 3411-3418) using both IPv4 and IPv6. 
-
-Support for SNMPv2 classic (a.k.a. "SNMPv2 historic" - RFCs 1441-1452) was dropped with the 4.0 release of the UCD-snmp package.
-
-The Simple Network Management Protocol (SNMP) server is used to listen for SNMP commands from an SNMP management system, execute the commands or collect the information and then send results back to the requesting system.
-    Rationale: The SNMP server can communicate using `SNMPv1`, which transmits data in the clear and does not require authentication to execute commands. `SNMPv3` replaces the simple/clear text password sharing used in `SNMPv2` with more securely encoded parameters. If the the SNMP service is not required, the `net-snmp` package should be removed to reduce the attack surface of the system.
-
-**Note:** If SNMP is required:
-- The server should be configured for `SNMP v3` only. `User Authentication` and `Message Encryption` should be configured.
-- If `SNMP v2` is **absolutely** necessary, modify the community strings' values.
+    Description: Simple Network Management Protocol (SNMP) is a widely used protocol for monitoring the health and welfare of network equipment, computer equipment and devices like UPSs.   Net-SNMP is a suite of applications used to implement SNMPv1 (RFC 1157), SNMPv2 (RFCs 1901-1908), and SNMPv3 (RFCs 3411-3418) using both IPv4 and IPv6.   Support for SNMPv2 classic (a.k.a. "SNMPv2 historic" - RFCs 1441-1452) was dropped with the 4.0 release of the UCD-snmp package.  The Simple Network Management Protocol (SNMP) server is used to listen for SNMP commands from an SNMP management system, execute the commands or collect the information and then send results back to the requesting system.
+    Rationale: The SNMP server can communicate using `SNMPv1`, which transmits data in the clear and does not require authentication to execute commands. `SNMPv3` replaces the simple/clear text password sharing used in `SNMPv2` with more securely encoded parameters. If the the SNMP service is not required, the `net-snmp` package should be removed to reduce the attack surface of the system.  **Note:** If SNMP is required: - The server should be configured for `SNMP v3` only. `User Authentication` and `Message Encryption` should be configured. - If `SNMP v2` is **absolutely** necessary, modify the community strings' values.
   module:
 
 - name: |
     Control-ID: 2.2.16
     Title: Ensure mail transfer agent is configured for local-only mode
     Description: Mail Transfer Agents (MTA), such as sendmail and Postfix, are used to listen for incoming mail and transfer the messages to the appropriate user or mail server. If the system is not intended to be a mail server, it is recommended that the MTA be configured to only process local mail.
-    Rationale: The software for all Mail Transfer Agents is complex and most have a long history of security issues. While it is important to ensure that the system can process local mail messages, it is not necessary to have the MTA's daemon listening on a port unless the server is intended to be a mail server that receives and processes mail from other systems.
-
-_Notes:_
-- _This recommendation is designed around the postfix mail server._
-- _Depending on your environment you may have an alternative MTA installed such as sendmail. If this is the case consult the documentation for your installed MTA to configure the recommended state._
+    Rationale: The software for all Mail Transfer Agents is complex and most have a long history of security issues. While it is important to ensure that the system can process local mail messages, it is not necessary to have the MTA's daemon listening on a port unless the server is intended to be a mail server that receives and processes mail from other systems.  _Notes:_ - _This recommendation is designed around the postfix mail server._ - _Depending on your environment you may have an alternative MTA installed such as sendmail. If this is the case consult the documentation for your installed MTA to configure the recommended state._
   module:
 
 - name: |
     Control-ID: 2.2.17
     Title: Ensure rsync is not installed or the rsyncd service is masked
     Description: The `rsyncd` service can be used to synchronize files between systems over network links.
-    Rationale: Unless required, the `rsync` package should be removed to reduce the attack surface area of the system.
-
-The `rsyncd` service presents a security risk as it uses unencrypted protocols for communication.
-
-_Note: If a required dependency exists for the `rsync` package, but the `rsyncd` service is not required, the service should be masked._
+    Rationale: Unless required, the `rsync` package should be removed to reduce the attack surface area of the system.  The `rsyncd` service presents a security risk as it uses unencrypted protocols for communication.  _Note: If a required dependency exists for the `rsync` package, but the `rsyncd` service is not required, the service should be masked._
   module:
 
 - name: |
@@ -798,16 +638,8 @@ _Note: If a required dependency exists for the `rsync` package, but the `rsyncd`
 - name: |
     Control-ID: 3.5.1.1
     Title: Ensure FirewallD is installed
-    Description: firewalld is a firewall management tool for Linux operating systems. It provides firewall features by acting as a front-end for the Linux kernel's netfilter framework via the iptables backend or provides firewall features by acting as a front-end for the Linux kernel's netfilter framework via the nftables utility.
-
-FirewallD replaces iptables as the default firewall management tool. Use the firewalld utility to configure a firewall for less complex firewalls. The utility is easy to use and covers the typical use cases scenario. FirewallD supports both IPv4 and IPv6 networks and can administer separate firewall zones with varying degrees of trust as defined in zone profiles.
-
-_Note: Starting in v0.6.0, FirewallD added support for acting as a front-end for the Linux kernel's netfilter framework via the nftables userspace utility, acting as an alternative to the nft command line program._
-    Rationale: A firewall utility is required to configure the Linux kernel's netfilter framework via the iptables or nftables back-end.
-
-The Linux kernel's netfilter framework host-based firewall can protect against threats originating from within a corporate network to include malicious mobile code and poorly configured software on a host.
-
-_Note: Only **one** firewall utility should be installed and configured. `FirewallD` is dependent on the `iptables` package._
+    Description: firewalld is a firewall management tool for Linux operating systems. It provides firewall features by acting as a front-end for the Linux kernel's netfilter framework via the iptables backend or provides firewall features by acting as a front-end for the Linux kernel's netfilter framework via the nftables utility.  FirewallD replaces iptables as the default firewall management tool. Use the firewalld utility to configure a firewall for less complex firewalls. The utility is easy to use and covers the typical use cases scenario. FirewallD supports both IPv4 and IPv6 networks and can administer separate firewall zones with varying degrees of trust as defined in zone profiles.  _Note: Starting in v0.6.0, FirewallD added support for acting as a front-end for the Linux kernel's netfilter framework via the nftables userspace utility, acting as an alternative to the nft command line program._
+    Rationale: A firewall utility is required to configure the Linux kernel's netfilter framework via the iptables or nftables back-end.  The Linux kernel's netfilter framework host-based firewall can protect against threats originating from within a corporate network to include malicious mobile code and poorly configured software on a host.  _Note: Only **one** firewall utility should be installed and configured. `FirewallD` is dependent on the `iptables` package._
   module:
 
 - name: |
@@ -820,12 +652,8 @@ _Note: Only **one** firewall utility should be installed and configured. `Firewa
 - name: |
     Control-ID: 3.5.1.3
     Title: Ensure nftables is not installed or stopped and masked
-    Description: nftables is a subsystem of the Linux kernel providing filtering and classification of network packets/datagrams/frames and is the successor to iptables.
-
-_Note: Support for using nftables as the back-end for firewalld was added in release v0.6.0. In Fedora 19 Linux derivatives, firewalld utilizes iptables as its back-end by default._
-    Rationale: Running both firewalld and nftables may lead to conflict.
-
-_Note: firewalld may configured as the front-end to nftables. If this case, nftables should be stopped and masked instead of removed._
+    Description: nftables is a subsystem of the Linux kernel providing filtering and classification of network packets/datagrams/frames and is the successor to iptables.  _Note: Support for using nftables as the back-end for firewalld was added in release v0.6.0. In Fedora 19 Linux derivatives, firewalld utilizes iptables as its back-end by default._
+    Rationale: Running both firewalld and nftables may lead to conflict.  _Note: firewalld may configured as the front-end to nftables. If this case, nftables should be stopped and masked instead of removed._
   module:
 
 - name: |
@@ -838,50 +666,28 @@ _Note: firewalld may configured as the front-end to nftables. If this case, nfta
 - name: |
     Control-ID: 3.5.1.5
     Title: Ensure default zone is set
-    Description: A firewall zone defines the trust level for a connection, interface or source address binding. This is a one to many relation, which means that a connection, interface or source can only be part of one zone, but a zone can be used for many network connections, interfaces and sources.
-- The default zone is the zone that is used for everything that is not explicitly bound/assigned to another zone.
-- If no zone assigned to a connection, interface or source, only the default zone is used. 
-- The default zone is not always listed as being used for an interface or source as it will be used for it either way. This depends on the manager of the interfaces.
-
-Connections handled by NetworkManager are listed as NetworkManager requests to add the zone binding for the interface used by the connection. Also interfaces under control of the network service are listed also because the service requests it.
-
-_Notes:_
-- _A firewalld zone configuration file contains the information for a zone._
- - _These are the zone description, services, ports, protocols, icmp-blocks, masquerade, forward-ports and rich language rules in an XML file format._
- - _The file name has to be `zone_name.xml` where length of `zone_name` is currently limited to 17 chars._
-- _NetworkManager binds interfaces to zones automatically_
+    Description: A firewall zone defines the trust level for a connection, interface or source address binding. This is a one to many relation, which means that a connection, interface or source can only be part of one zone, but a zone can be used for many network connections, interfaces and sources. - The default zone is the zone that is used for everything that is not explicitly bound/assigned to another zone. - If no zone assigned to a connection, interface or source, only the default zone is used.  - The default zone is not always listed as being used for an interface or source as it will be used for it either way. This depends on the manager of the interfaces.  Connections handled by NetworkManager are listed as NetworkManager requests to add the zone binding for the interface used by the connection. Also interfaces under control of the network service are listed also because the service requests it.  _Notes:_ - _A firewalld zone configuration file contains the information for a zone._  - _These are the zone description, services, ports, protocols, icmp-blocks, masquerade, forward-ports and rich language rules in an XML file format._  - _The file name has to be `zone_name.xml` where length of `zone_name` is currently limited to 17 chars._ - _NetworkManager binds interfaces to zones automatically_
     Rationale: Because the default zone is the zone that is used for everything that is not explicitly bound/assigned to another zone, it is important for the default zone to set
   module:
 
 - name: |
     Control-ID: 3.5.1.6
     Title: Ensure network interfaces are assigned to appropriate zone
-    Description: firewall zones define the trust level of network connections or interfaces.
-
-_Note: The firewall in the Linux kernel is not able to handle network connections with the name shown by NetworkManager, it can only handle the network interfaces used by the connection. Because of this NetworkManager tells firewalld to assign the network interface that is used for this connection to the zone defined in the configuration of that connection. This assignment happens before the interface is used. The configuration of the connection can either be the NetworkManager configuration or also an ifcfg. For example: If the zone is not set in the configuration file, the interfaces will be assigned to the default zone defined in the firewalld configuration. If a connection has more than one interface, all of them will be supplied to firewalld. Also changes in the names of interfaces will be handled by NetworkManager and supplied to firewalld._
+    Description: firewall zones define the trust level of network connections or interfaces.  _Note: The firewall in the Linux kernel is not able to handle network connections with the name shown by NetworkManager, it can only handle the network interfaces used by the connection. Because of this NetworkManager tells firewalld to assign the network interface that is used for this connection to the zone defined in the configuration of that connection. This assignment happens before the interface is used. The configuration of the connection can either be the NetworkManager configuration or also an ifcfg. For example: If the zone is not set in the configuration file, the interfaces will be assigned to the default zone defined in the firewalld configuration. If a connection has more than one interface, all of them will be supplied to firewalld. Also changes in the names of interfaces will be handled by NetworkManager and supplied to firewalld._
     Rationale: A network interface not assigned to the appropriate zone can allow unexpected or undesired network traffic to be accepted on the interface.
   module:
 
 - name: |
     Control-ID: 3.5.1.7
     Title: Ensure unnecessary services and ports are not accepted
-    Description: Services and ports can be accepted or explicitly rejected or dropped by a zone.
-
-For every zone, you can set a default behavior that handles incoming traffic that is not further specified. Such behavior is defined by setting the target of the zone. There are three options - default, ACCEPT, REJECT, and DROP.
-- ACCEPT - you accept all incoming packets except those disabled by a specific rule.
-- REJECT - you disable all incoming packets except those that you have allowed in specific rules and the source machine is informed about the rejection.
-- DROP - you disable all incoming packets except those that you have allowed in specific rules and no information sent to the source machine.
+    Description: Services and ports can be accepted or explicitly rejected or dropped by a zone.  For every zone, you can set a default behavior that handles incoming traffic that is not further specified. Such behavior is defined by setting the target of the zone. There are three options - default, ACCEPT, REJECT, and DROP. - ACCEPT - you accept all incoming packets except those disabled by a specific rule. - REJECT - you disable all incoming packets except those that you have allowed in specific rules and the source machine is informed about the rejection. - DROP - you disable all incoming packets except those that you have allowed in specific rules and no information sent to the source machine.
     Rationale: To reduce the attack surface of a system, all services and ports should be blocked unless required
   module:
 
 - name: |
     Control-ID: 3.5.2.1
     Title: Ensure nftables is installed
-    Description: nftables provides a new in-kernel packet classification framework that is based on a network-specific Virtual Machine (VM) and a new nft userspace command line tool. nftables reuses the existing Netfilter subsystems such as the existing hook infrastructure, the connection tracking system, NAT, userspace queuing and logging subsystem.
-
-_Notes:_
-- _nftables is available in Linux kernel 3.13 and newer._
-- _Only one firewall utility should be installed and configured._
+    Description: nftables provides a new in-kernel packet classification framework that is based on a network-specific Virtual Machine (VM) and a new nft userspace command line tool. nftables reuses the existing Netfilter subsystems such as the existing hook infrastructure, the connection tracking system, NAT, userspace queuing and logging subsystem.  _Notes:_ - _nftables is available in Linux kernel 3.13 and newer._ - _Only one firewall utility should be installed and configured._
     Rationale: nftables is a subsystem of the Linux kernel that can protect against threats originating from within a corporate network to include malicious mobile code and poorly configured software on a host.
   module:
 
@@ -938,11 +744,7 @@ _Notes:_
     Control-ID: 3.5.2.9
     Title: Ensure default deny firewall policy
     Description: Base chain policy is the default verdict that will be applied to packets reaching the end of the chain.
-    Rationale: There are two policies: accept (Default) and drop. If the policy is set to `accept`, the firewall will accept any packet that is not configured to be denied and the packet will continue traversing the network stack.
-
-It is easier to white list acceptable usage than to black list unacceptable usage.
-
-_Note: Changing firewall settings while connected over network can result in being locked out of the system._
+    Rationale: There are two policies: accept (Default) and drop. If the policy is set to `accept`, the firewall will accept any packet that is not configured to be denied and the packet will continue traversing the network stack.  It is easier to white list acceptable usage than to black list unacceptable usage.  _Note: Changing firewall settings while connected over network can result in being locked out of the system._
   module:
 
 - name: |
@@ -955,11 +757,7 @@ _Note: Changing firewall settings while connected over network can result in bei
 - name: |
     Control-ID: 3.5.2.11
     Title: Ensure nftables rules are permanent
-    Description: nftables is a subsystem of the Linux kernel providing filtering and classification of network packets/datagrams/frames.
-
-The nftables service reads the `/etc/sysconfig/nftables.conf` file for a nftables file or files to include in the nftables ruleset.
-
-A nftables ruleset containing the input, forward, and output base chains allow network traffic to be filtered.
+    Description: nftables is a subsystem of the Linux kernel providing filtering and classification of network packets/datagrams/frames.  The nftables service reads the `/etc/sysconfig/nftables.conf` file for a nftables file or files to include in the nftables ruleset.  A nftables ruleset containing the input, forward, and output base chains allow network traffic to be filtered.
     Rationale: Changes made to nftables ruleset only affect the live system, you will also need to configure the nftables ruleset to apply on boot
   module:
 
@@ -988,38 +786,28 @@ A nftables ruleset containing the input, forward, and output base chains allow n
     Control-ID: 3.5.3.2.1
     Title: Ensure default deny firewall policy
     Description: A default deny all policy on connections ensures that any unconfigured network usage will be rejected.
-    Rationale: With a default accept policy the firewall will accept any packet that is not configured to be denied. It is easier to white list acceptable usage than to black list unacceptable usage.
-
-_Note: Changing firewall settings while connected over network can result in being locked out of the system._
+    Rationale: With a default accept policy the firewall will accept any packet that is not configured to be denied. It is easier to white list acceptable usage than to black list unacceptable usage.  _Note: Changing firewall settings while connected over network can result in being locked out of the system._
   module:
 
 - name: |
     Control-ID: 3.5.3.2.2
     Title: Ensure loopback traffic is configured
     Description: Configure the loopback interface to accept traffic. Configure all other interfaces to deny traffic to the loopback network (127.0.0.0/8).
-    Rationale: Loopback traffic is generated between processes on machine and is typically critical to operation of the system. The loopback interface is the only place that loopback network (127.0.0.0/8) traffic should be seen, all other interfaces should ignore traffic on this network as an anti-spoofing measure.
-
-_Note: Changing firewall settings while connected over network can result in being locked out of the system._
+    Rationale: Loopback traffic is generated between processes on machine and is typically critical to operation of the system. The loopback interface is the only place that loopback network (127.0.0.0/8) traffic should be seen, all other interfaces should ignore traffic on this network as an anti-spoofing measure.  _Note: Changing firewall settings while connected over network can result in being locked out of the system._
   module:
 
 - name: |
     Control-ID: 3.5.3.2.3
     Title: Ensure outbound and established connections are configured
     Description: Configure the firewall rules for new outbound, and established connections.
-    Rationale: If rules are not in place for new outbound, and established connections all packets will be dropped by the default policy preventing network usage.
-
-_Note: Changing firewall settings while connected over network can result in being locked out of the system._
+    Rationale: If rules are not in place for new outbound, and established connections all packets will be dropped by the default policy preventing network usage.  _Note: Changing firewall settings while connected over network can result in being locked out of the system._
   module:
 
 - name: |
     Control-ID: 3.5.3.2.4
     Title: Ensure firewall rules exist for all open ports
     Description: Any ports that have been opened on non-loopback addresses need firewall rules to govern traffic.
-    Rationale: Without a firewall rule configured for open ports default firewall policy will drop all packets to these ports.
-
-_Notes:_
-- _Changing firewall settings while connected over network can result in being locked out of the system._
-- _The remediation command opens up the port to traffic from all sources. Consult iptables documentation and set any restrictions in compliance with site policy._
+    Rationale: Without a firewall rule configured for open ports default firewall policy will drop all packets to these ports.  _Notes:_ - _Changing firewall settings while connected over network can result in being locked out of the system._ - _The remediation command opens up the port to traffic from all sources. Consult iptables documentation and set any restrictions in compliance with site policy._
   module:
 
 - name: |
@@ -1040,38 +828,28 @@ _Notes:_
     Control-ID: 3.5.3.3.1
     Title: Ensure IPv6 default deny firewall policy
     Description: A default deny all policy on connections ensures that any unconfigured network usage will be rejected.
-    Rationale: With a default accept policy the firewall will accept any packet that is not configured to be denied. It is easier to white list acceptable usage than to black list unacceptable usage.
-
-_Note: Changing firewall settings while connected over network can result in being locked out of the system._
+    Rationale: With a default accept policy the firewall will accept any packet that is not configured to be denied. It is easier to white list acceptable usage than to black list unacceptable usage.  _Note: Changing firewall settings while connected over network can result in being locked out of the system._
   module:
 
 - name: |
     Control-ID: 3.5.3.3.2
     Title: Ensure IPv6 loopback traffic is configured
     Description: Configure the loopback interface to accept traffic. Configure all other interfaces to deny traffic to the loopback network (::1).
-    Rationale: Loopback traffic is generated between processes on machine and is typically critical to operation of the system. The loopback interface is the only place that loopback network (::1) traffic should be seen, all other interfaces should ignore traffic on this network as an anti-spoofing measure.
-
-_Note: Changing firewall settings while connected over network can result in being locked out of the system._
+    Rationale: Loopback traffic is generated between processes on machine and is typically critical to operation of the system. The loopback interface is the only place that loopback network (::1) traffic should be seen, all other interfaces should ignore traffic on this network as an anti-spoofing measure.  _Note: Changing firewall settings while connected over network can result in being locked out of the system._
   module:
 
 - name: |
     Control-ID: 3.5.3.3.3
     Title: Ensure IPv6 outbound and established connections are configured
     Description: Configure the firewall rules for new outbound, and established IPv6 connections.
-    Rationale: If rules are not in place for new outbound, and established connections all packets will be dropped by the default policy preventing network usage.
-
-_Note: Changing firewall settings while connected over network can result in being locked out of the system._
+    Rationale: If rules are not in place for new outbound, and established connections all packets will be dropped by the default policy preventing network usage.  _Note: Changing firewall settings while connected over network can result in being locked out of the system._
   module:
 
 - name: |
     Control-ID: 3.5.3.3.4
     Title: Ensure IPv6 firewall rules exist for all open ports
     Description: Any ports that have been opened on non-loopback addresses need firewall rules to govern traffic.
-    Rationale: Without a firewall rule configured for open ports default firewall policy will drop all packets to these ports.
-
-_Notes:_
-- _Changing firewall settings while connected over network can result in being locked out of the system._
-- _The remediation command opens up the port to traffic from all sources. Consult iptables documentation and set any restrictions in compliance with site policy._
+    Rationale: Without a firewall rule configured for open ports default firewall policy will drop all packets to these ports.  _Notes:_ - _Changing firewall settings while connected over network can result in being locked out of the system._ - _The remediation command opens up the port to traffic from all sources. Consult iptables documentation and set any restrictions in compliance with site policy._
   module:
 
 - name: |
@@ -1091,12 +869,7 @@ _Notes:_
 - name: |
     Control-ID: 4.2.1.1
     Title: Ensure rsyslog is installed
-    Description: The `rsyslog` software is a recommended replacement to the original `syslogd` daemon. 
-
-`rsyslog` provides improvements over `syslogd`, including:
-- connection-oriented (i.e. TCP) transmission of logs
-- The option to log to database formats
-- Encryption of log data en route to a central logging server
+    Description: The `rsyslog` software is a recommended replacement to the original `syslogd` daemon.   `rsyslog` provides improvements over `syslogd`, including: - connection-oriented (i.e. TCP) transmission of logs - The option to log to database formats - Encryption of log data en route to a central logging server
     Rationale: The security enhancements of `rsyslog` such as connection-oriented (i.e. TCP) transmission of logs, the option to log to database formats, and the encryption of log data en route to a central logging server) justify installing and configuring the package.
   module:
 
@@ -1110,13 +883,7 @@ _Notes:_
 - name: |
     Control-ID: 4.2.1.3
     Title: Ensure rsyslog default file permissions configured
-    Description: `rsyslog` will create logfiles that do not already exist on the system. This setting controls what permissions will be applied to these newly created files.
-
-The `$FileCreateMode` parameter specifies the file creation mode with which rsyslogd creates new files. If not specified, the value 0644 is used. 
-
-_Notes:_
-- _The value given must always be a 4-digit octal number, with the initial digit being zero._
-- _This setting can be overridden by a less restrictive setting in any file ending in `.conf` in the `/etc/rsyslog.d/` directory_
+    Description: `rsyslog` will create logfiles that do not already exist on the system. This setting controls what permissions will be applied to these newly created files.  The `$FileCreateMode` parameter specifies the file creation mode with which rsyslogd creates new files. If not specified, the value 0644 is used.   _Notes:_ - _The value given must always be a 4-digit octal number, with the initial digit being zero._ - _This setting can be overridden by a less restrictive setting in any file ending in `.conf` in the `/etc/rsyslog.d/` directory_
     Rationale: It is important to ensure that log files have the correct permissions to ensure that sensitive data is archived and protected.
   module:
 
@@ -1130,48 +897,35 @@ _Notes:_
 - name: |
     Control-ID: 4.2.1.5
     Title: Ensure rsyslog is configured to send logs to a remote log host
-    Description: The `rsyslog` utility supports the ability to send logs it gathers to a remote log host running `syslogd(8)` or to receive messages from remote hosts, reducing administrative overhead.
-
-_Note: The double "at" sign (`@@`) directs `rsyslog` to use TCP to send log messages to the server, which is a more reliable transport mechanism than the default UDP protocol._
+    Description: The `rsyslog` utility supports the ability to send logs it gathers to a remote log host running `syslogd(8)` or to receive messages from remote hosts, reducing administrative overhead.  _Note: The double "at" sign (`@@`) directs `rsyslog` to use TCP to send log messages to the server, which is a more reliable transport mechanism than the default UDP protocol._
     Rationale: Storing log data on a remote host protects log integrity from local attacks. If an attacker gains root access on the local system, they could tamper with or remove log data that is stored on the local system
   module:
 
 - name: |
     Control-ID: 4.2.1.6
     Title: Ensure remote rsyslog messages are only accepted on designated log hosts.
-    Description: By default, `rsyslog` does not listen for log messages coming in from remote systems. The `ModLoad` tells `rsyslog` to load the `imtcp.so` module so it can listen over a network via TCP. The `InputTCPServerRun` option instructs `rsyslogd` to listen on the specified TCP port.
-
-_Note: The `$ModLoad imtcp` line can have the `.so` extension added to the end of the module, or use the full path to the module._
+    Description: By default, `rsyslog` does not listen for log messages coming in from remote systems. The `ModLoad` tells `rsyslog` to load the `imtcp.so` module so it can listen over a network via TCP. The `InputTCPServerRun` option instructs `rsyslogd` to listen on the specified TCP port.  _Note: The `$ModLoad imtcp` line can have the `.so` extension added to the end of the module, or use the full path to the module._
     Rationale: The guidance in the section ensures that remote log hosts are configured to only accept `rsyslog` data from hosts within the specified domain and that those systems that are not designed to be log hosts do not accept any remote `rsyslog` messages. This provides protection from spoofed log data and ensures that system administrators are reviewing reasonably complete syslog data in a central location.
   module:
 
 - name: |
     Control-ID: 4.2.2.1
     Title: Ensure journald is configured to send logs to rsyslog
-    Description: Data from journald may be stored in volatile memory or persisted locally on the server. Utilities exist to accept remote export of journald logs, however, use of the rsyslog service provides a consistent means of log collection and export.
-
-_Notes:_
-- _This recommendation assumes that recommendation 4.2.1.5, "Ensure rsyslog is configured to send logs to a remote log host" has been implemented._
-- _The main configuration file `/etc/systemd/journald.conf` is read before any of the custom *.conf files. If there are custom configs present, they override the main configuration parameters_
-- _As noted in the journald man pages: journald logs may be exported to rsyslog either through the process mentioned here, or through a facility like `systemd-journald.service`. There are trade-offs involved in each implementation, where `ForwardToSyslog` will immediately capture all events (and forward to an external log server, if properly configured), but may not capture all boot-up activities. Mechanisms such as `systemd-journald.service`, on the other hand, will record bootup events, but may delay sending the information to rsyslog, leading to the potential for log manipulation prior to export. Be aware of the limitations of all tools employed to secure a system._
+    Description: Data from journald may be stored in volatile memory or persisted locally on the server. Utilities exist to accept remote export of journald logs, however, use of the rsyslog service provides a consistent means of log collection and export.  _Notes:_ - _This recommendation assumes that recommendation 4.2.1.5, "Ensure rsyslog is configured to send logs to a remote log host" has been implemented._ - _The main configuration file `/etc/systemd/journald.conf` is read before any of the custom *.conf files. If there are custom configs present, they override the main configuration parameters_ - _As noted in the journald man pages: journald logs may be exported to rsyslog either through the process mentioned here, or through a facility like `systemd-journald.service`. There are trade-offs involved in each implementation, where `ForwardToSyslog` will immediately capture all events (and forward to an external log server, if properly configured), but may not capture all boot-up activities. Mechanisms such as `systemd-journald.service`, on the other hand, will record bootup events, but may delay sending the information to rsyslog, leading to the potential for log manipulation prior to export. Be aware of the limitations of all tools employed to secure a system._
     Rationale: Storing log data on a remote host protects log integrity from local attacks. If an attacker gains root access on the local system, they could tamper with or remove log data that is stored on the local system.
   module:
 
 - name: |
     Control-ID: 4.2.2.2
     Title: Ensure journald is configured to compress large log files
-    Description: The journald system includes the capability of compressing overly large files to avoid filling up the system with logs or making the logs unmanageably large.
-
-_Note: The main configuration file `/etc/systemd/journald.conf` is read before any of the custom *.conf files. If there are custom configs present, they override the main configuration parameters_
+    Description: The journald system includes the capability of compressing overly large files to avoid filling up the system with logs or making the logs unmanageably large.  _Note: The main configuration file `/etc/systemd/journald.conf` is read before any of the custom *.conf files. If there are custom configs present, they override the main configuration parameters_
     Rationale: Uncompressed large files may unexpectedly fill a filesystem leading to resource unavailability. Compressing logs prior to write can prevent sudden, unexpected filesystem impacts.
   module:
 
 - name: |
     Control-ID: 4.2.2.3
     Title: Ensure journald is configured to write logfiles to persistent disk
-    Description: Data from journald may be stored in volatile memory or persisted locally on the server. Logs in memory will be lost upon a system reboot. By persisting logs to local disk on the server they are protected from loss.
-
-_Note: The main configuration file `/etc/systemd/journald.conf` is read before any of the custom *.conf files. If there are custom configs present, they override the main configuration parameters_
+    Description: Data from journald may be stored in volatile memory or persisted locally on the server. Logs in memory will be lost upon a system reboot. By persisting logs to local disk on the server they are protected from loss.  _Note: The main configuration file `/etc/systemd/journald.conf` is read before any of the custom *.conf files. If there are custom configs present, they override the main configuration parameters_
     Rationale: Writing log data to disk will provide the ability to forensically reconstruct events which may have impacted the operations or security of a system even after a system crash or reboot.
   module:
 
@@ -1185,9 +939,7 @@ _Note: The main configuration file `/etc/systemd/journald.conf` is read before a
 - name: |
     Control-ID: 4.2.4
     Title: Ensure logrotate is configured
-    Description: The system includes the capability of rotating log files regularly to avoid filling up the system with logs or making the logs unmanageably large. The file `/etc/logrotate.d/syslog` is the configuration file used to rotate log files created by `syslog` or `rsyslog`.
-
-_Note: If no `maxage` setting is set for logrotate a situation can occur where logrotate is interrupted and fails to delete rotated logfiles. It is recommended to set this to a value greater than the longest any log file should exist on your system to ensure that any such logfile is removed but standard rotation settings are not overridden._
+    Description: The system includes the capability of rotating log files regularly to avoid filling up the system with logs or making the logs unmanageably large. The file `/etc/logrotate.d/syslog` is the configuration file used to rotate log files created by `syslog` or `rsyslog`.  _Note: If no `maxage` setting is set for logrotate a situation can occur where logrotate is interrupted and fails to delete rotated logfiles. It is recommended to set this to a value greater than the longest any log file should exist on your system to ensure that any such logfile is removed but standard rotation settings are not overridden._
     Rationale: By keeping the log files smaller and more manageable, a system administrator can easily archive these files to another system and spend less time looking through inordinately large log files.
   module:
 
@@ -1243,18 +995,14 @@ _Note: If no `maxage` setting is set for logrotate a situation can occur where l
 - name: |
     Control-ID: 5.1.8
     Title: Ensure cron is restricted to authorized users
-    Description: If `cron` is installed in the system, configure `/etc/cron.allow` to allow specific users to use these services. If `/etc/cron.allow` does not exist, then `/etc/cron.deny` is checked. Any user not specifically defined in those files is allowed to use cron. By removing the file, only users in `/etc/cron.allow` are allowed to use cron. 
-
-_Note: Even though a given user is not listed in `cron.allow`, cron jobs can still be run as that user. The `cron.allow` file only controls administrative access to the crontab command for scheduling and modifying cron jobs._
+    Description: If `cron` is installed in the system, configure `/etc/cron.allow` to allow specific users to use these services. If `/etc/cron.allow` does not exist, then `/etc/cron.deny` is checked. Any user not specifically defined in those files is allowed to use cron. By removing the file, only users in `/etc/cron.allow` are allowed to use cron.   _Note: Even though a given user is not listed in `cron.allow`, cron jobs can still be run as that user. The `cron.allow` file only controls administrative access to the crontab command for scheduling and modifying cron jobs._
     Rationale: On many systems, only the system administrator is authorized to schedule `cron` jobs. Using the `cron.allow` file to control who can run `cron` jobs enforces this policy. It is easier to manage an allow list than a deny list. In a deny list, you could potentially add a user ID to the system and forget to add it to the deny files.
   module:
 
 - name: |
     Control-ID: 5.1.9
     Title: Ensure at is restricted to authorized users
-    Description: If `at` is installed in the system, configure `/etc/at.allow` to allow specific users to use these services. If `/etc/at.allow` does not exist, then `/etc/at.deny` is checked. Any user not specifically defined in those files is allowed to use at. By removing the file, only users in `/etc/at.allow` are allowed to use at. 
-
-_Note: Even though a given user is not listed in `at.allow`, at jobs can still be run as that user. The `at.allow` file only controls administrative access to the at command for scheduling and modifying at jobs._
+    Description: If `at` is installed in the system, configure `/etc/at.allow` to allow specific users to use these services. If `/etc/at.allow` does not exist, then `/etc/at.deny` is checked. Any user not specifically defined in those files is allowed to use at. By removing the file, only users in `/etc/at.allow` are allowed to use at.   _Note: Even though a given user is not listed in `at.allow`, at jobs can still be run as that user. The `at.allow` file only controls administrative access to the at command for scheduling and modifying at jobs._
     Rationale: On many systems, only the system administrator is authorized to schedule `at` jobs. Using the `at.allow` file to control who can run `at` jobs enforces this policy. It is easier to manage an allow list than a deny list. In a deny list, you could potentially add a user ID to the system and forget to add it to the deny files.
   module:
 
@@ -1282,25 +1030,14 @@ _Note: Even though a given user is not listed in `at.allow`, at jobs can still b
 - name: |
     Control-ID: 5.2.4
     Title: Ensure SSH access is limited
-    Description: There are several options available to limit which users and group can access the system via SSH. It is recommended that at least one of the following options be leveraged:
-
-- `AllowUsers`:
- - The `AllowUsers` variable gives the system administrator the option of allowing specific users to `ssh` into the system. The list consists of space separated user names. Numeric user IDs are not recognized with this variable. If a system administrator wants to restrict user access further by only allowing the allowed users to log in from a particular host, the entry can be specified in the form of user@host.
-- `AllowGroups`:
- - The `AllowGroups` variable gives the system administrator the option of allowing specific groups of users to `ssh` into the system. The list consists of space separated group names. Numeric group IDs are not recognized with this variable.
-- `DenyUsers`:
- - The `DenyUsers` variable gives the system administrator the option of denying specific users to `ssh` into the system. The list consists of space separated user names. Numeric user IDs are not recognized with this variable. If a system administrator wants to restrict user access further by specifically denying a user's access from a particular host, the entry can be specified in the form of user@host.
-- `DenyGroups`:
- - The `DenyGroups` variable gives the system administrator the option of denying specific groups of users to `ssh` into the system. The list consists of space separated group names. Numeric group IDs are not recognized with this variable.
+    Description: There are several options available to limit which users and group can access the system via SSH. It is recommended that at least one of the following options be leveraged:  - `AllowUsers`:  - The `AllowUsers` variable gives the system administrator the option of allowing specific users to `ssh` into the system. The list consists of space separated user names. Numeric user IDs are not recognized with this variable. If a system administrator wants to restrict user access further by only allowing the allowed users to log in from a particular host, the entry can be specified in the form of user@host. - `AllowGroups`:  - The `AllowGroups` variable gives the system administrator the option of allowing specific groups of users to `ssh` into the system. The list consists of space separated group names. Numeric group IDs are not recognized with this variable. - `DenyUsers`:  - The `DenyUsers` variable gives the system administrator the option of denying specific users to `ssh` into the system. The list consists of space separated user names. Numeric user IDs are not recognized with this variable. If a system administrator wants to restrict user access further by specifically denying a user's access from a particular host, the entry can be specified in the form of user@host. - `DenyGroups`:  - The `DenyGroups` variable gives the system administrator the option of denying specific groups of users to `ssh` into the system. The list consists of space separated group names. Numeric group IDs are not recognized with this variable.
     Rationale: Restricting which users can remotely access the system via SSH will help ensure that only authorized users access the system.
   module:
 
 - name: |
     Control-ID: 5.2.5
     Title: Ensure SSH LogLevel is appropriate
-    Description: `INFO` level is the basic level that only records login activity of SSH users. In many situations, such as Incident Response, it is important to determine when a particular user was active on a system. The logout record can eliminate those users who disconnected, which helps narrow the field.
-
-`VERBOSE` level specifies that login and logout activity as well as the key fingerprint for any SSH key used for login will be logged. This information is important for SSH key management, especially in legacy environments.
+    Description: `INFO` level is the basic level that only records login activity of SSH users. In many situations, such as Incident Response, it is important to determine when a particular user was active on a system. The logout record can eliminate those users who disconnected, which helps narrow the field.  `VERBOSE` level specifies that login and logout activity as well as the key fingerprint for any SSH key used for login will be logged. This information is important for SSH key management, especially in legacy environments.
     Rationale: SSH provides several logging levels with varying amounts of verbosity. `DEBUG` is specifically **not** recommended other than strictly for debugging SSH communications since it provides so much data that it is difficult to identify important security information.
   module:
 
@@ -1349,113 +1086,29 @@ _Note: Even though a given user is not listed in `at.allow`, at jobs can still b
 - name: |
     Control-ID: 5.2.13
     Title: Ensure only strong Ciphers are used
-    Description: This variable limits the ciphers that SSH can use during communication.
-
-_Notes:_
-- _Some organizations may have stricter requirements for approved ciphers. Ensure that ciphers used are in compliance with site policy._
-- _The only "strong" ciphers currently FIPS 140-2 compliant are: aes256-ctr,aes192-ctr,aes128-ctr_
-- _CVE-2013-4548 referenced bellow applies to OpenSSH versions 6.2 and 6.3. If running these versions of Open SSH, Please upgrade to version 6.4 or later to fix the vulnerability, or disable AES-GCM in the server configuration._
-
-The Following are the supported ciphers in openSSH:
-```
-3des-cbc
-aes128-cbc
-aes192-cbc
-aes256-cbc
-aes128-ctr
-aes192-ctr
-aes256-ctr
-aes128-gcm@openssh.com
-aes256-gcm@openssh.com
-arcfour
-arcfour128
-arcfour256
-blowfish-cbc
-cast128-cbc
-rijndael-cbc@lysator.liu.se
-chacha20-poly1305@openssh.com
-```
-    Rationale: Weak ciphers that are used for authentication to the cryptographic module cannot be relied upon to provide confidentiality or integrity, and system data may be compromised.
-- The DES, Triple DES, and Blowfish ciphers, as used in SSH, have a birthday bound of approximately four billion blocks, which makes it easier for remote attackers to obtain cleartext data via a birthday attack against a long-duration encrypted session, aka a "Sweet32" attack
-- The RC4 algorithm, as used in the TLS protocol and SSL protocol, does not properly combine state data with key data during the initialization phase, which makes it easier for remote attackers to conduct plaintext-recovery attacks against the initial bytes of a stream by sniffing network traffic that occasionally relies on keys affected by the Invariance Weakness, and then using a brute-force approach involving LSB values, aka the "Bar Mitzvah" issue
-- The passwords used during an SSH session encrypted with RC4 can be recovered by an attacker who is able to capture and replay the session
-- Error handling in the SSH protocol; Client and Server, when using a block cipher algorithm in Cipher Block Chaining (CBC) mode, makes it easier for remote attackers to recover certain plaintext data from an arbitrary block of ciphertext in an SSH session via unknown vectors
-- The mm_newkeys_from_blob function in monitor_wrap.c, when an AES-GCM cipher is used, does not properly initialize memory for a MAC context data structure, which allows remote authenticated users to bypass intended ForceCommand and login-shell restrictions via packet data that provides a crafted callback address
+    Description: This variable limits the ciphers that SSH can use during communication.  _Notes:_ - _Some organizations may have stricter requirements for approved ciphers. Ensure that ciphers used are in compliance with site policy._ - _The only "strong" ciphers currently FIPS 140-2 compliant are: aes256-ctr,aes192-ctr,aes128-ctr_ - _CVE-2013-4548 referenced bellow applies to OpenSSH versions 6.2 and 6.3. If running these versions of Open SSH, Please upgrade to version 6.4 or later to fix the vulnerability, or disable AES-GCM in the server configuration._  The Following are the supported ciphers in openSSH: ``` 3des-cbc aes128-cbc aes192-cbc aes256-cbc aes128-ctr aes192-ctr aes256-ctr aes128-gcm@openssh.com aes256-gcm@openssh.com arcfour arcfour128 arcfour256 blowfish-cbc cast128-cbc rijndael-cbc@lysator.liu.se chacha20-poly1305@openssh.com ```
+    Rationale: Weak ciphers that are used for authentication to the cryptographic module cannot be relied upon to provide confidentiality or integrity, and system data may be compromised. - The DES, Triple DES, and Blowfish ciphers, as used in SSH, have a birthday bound of approximately four billion blocks, which makes it easier for remote attackers to obtain cleartext data via a birthday attack against a long-duration encrypted session, aka a "Sweet32" attack - The RC4 algorithm, as used in the TLS protocol and SSL protocol, does not properly combine state data with key data during the initialization phase, which makes it easier for remote attackers to conduct plaintext-recovery attacks against the initial bytes of a stream by sniffing network traffic that occasionally relies on keys affected by the Invariance Weakness, and then using a brute-force approach involving LSB values, aka the "Bar Mitzvah" issue - The passwords used during an SSH session encrypted with RC4 can be recovered by an attacker who is able to capture and replay the session - Error handling in the SSH protocol; Client and Server, when using a block cipher algorithm in Cipher Block Chaining (CBC) mode, makes it easier for remote attackers to recover certain plaintext data from an arbitrary block of ciphertext in an SSH session via unknown vectors - The mm_newkeys_from_blob function in monitor_wrap.c, when an AES-GCM cipher is used, does not properly initialize memory for a MAC context data structure, which allows remote authenticated users to bypass intended ForceCommand and login-shell restrictions via packet data that provides a crafted callback address
   module:
 
 - name: |
     Control-ID: 5.2.14
     Title: Ensure only strong MAC algorithms are used
-    Description: This variable limits the types of MAC algorithms that SSH can use during communication.
-
-_Notes:_
-- _Some organizations may have stricter requirements for approved MACs. Ensure that MACs used are in compliance with site policy._
-- _The only "strong" MACs currently FIPS 140-2 approved are hmac-sha2-256 and hmac-sha2-512_
-
-The Supported MACs are:
-```
-hmac-md5
-hmac-md5-96
-hmac-ripemd160
-hmac-sha1
-hmac-sha1-96
-hmac-sha2-256
-hmac-sha2-512
-umac-64@openssh.com
-umac-128@openssh.com
-hmac-md5-etm@openssh.com
-hmac-md5-96-etm@openssh.com
-hmac-ripemd160-etm@openssh.com
-hmac-sha1-etm@openssh.com
-hmac-sha1-96-etm@openssh.com
-hmac-sha2-256-etm@openssh.com
-hmac-sha2-512-etm@openssh.com
-umac-64-etm@openssh.com
-umac-128-etm@openssh.com
-```
+    Description: This variable limits the types of MAC algorithms that SSH can use during communication.  _Notes:_ - _Some organizations may have stricter requirements for approved MACs. Ensure that MACs used are in compliance with site policy._ - _The only "strong" MACs currently FIPS 140-2 approved are hmac-sha2-256 and hmac-sha2-512_  The Supported MACs are: ``` hmac-md5 hmac-md5-96 hmac-ripemd160 hmac-sha1 hmac-sha1-96 hmac-sha2-256 hmac-sha2-512 umac-64@openssh.com umac-128@openssh.com hmac-md5-etm@openssh.com hmac-md5-96-etm@openssh.com hmac-ripemd160-etm@openssh.com hmac-sha1-etm@openssh.com hmac-sha1-96-etm@openssh.com hmac-sha2-256-etm@openssh.com hmac-sha2-512-etm@openssh.com umac-64-etm@openssh.com umac-128-etm@openssh.com ```
     Rationale: MD5 and 96-bit MAC algorithms are considered weak and have been shown to increase exploitability in SSH downgrade attacks. Weak algorithms continue to have a great deal of attention as a weak spot that can be exploited with expanded computing power. An attacker that breaks the algorithm could take advantage of a MiTM position to decrypt the SSH tunnel and capture credentials and information
   module:
 
 - name: |
     Control-ID: 5.2.15
     Title: Ensure only strong Key Exchange algorithms are used
-    Description: Key exchange is any method in cryptography by which cryptographic keys are exchanged between two parties, allowing use of a cryptographic algorithm. If the sender and receiver wish to exchange encrypted messages, each must be equipped to encrypt messages to be sent and decrypt messages received
-
-_Notes:_
-- _Kex algorithms have a higher preference the earlier they appear in the list_
-- _Some organizations may have stricter requirements for approved Key exchange algorithms. Ensure that Key exchange algorithms used are in compliance with site policy._
-- _The only Key Exchange Algorithms currently FIPS 140-2 approved are: ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256_
-
-The Key Exchange algorithms supported by OpenSSH 7 are:
-```
-curve25519-sha256
-curve25519-sha256@libssh.org
-diffie-hellman-group1-sha1
-diffie-hellman-group14-sha1
-diffie-hellman-group-exchange-sha1
-diffie-hellman-group-exchange-sha256
-ecdh-sha2-nistp256
-ecdh-sha2-nistp384
-ecdh-sha2-nistp521
-```
+    Description: Key exchange is any method in cryptography by which cryptographic keys are exchanged between two parties, allowing use of a cryptographic algorithm. If the sender and receiver wish to exchange encrypted messages, each must be equipped to encrypt messages to be sent and decrypt messages received  _Notes:_ - _Kex algorithms have a higher preference the earlier they appear in the list_ - _Some organizations may have stricter requirements for approved Key exchange algorithms. Ensure that Key exchange algorithms used are in compliance with site policy._ - _The only Key Exchange Algorithms currently FIPS 140-2 approved are: ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group14-sha256_  The Key Exchange algorithms supported by OpenSSH 7 are: ``` curve25519-sha256 curve25519-sha256@libssh.org diffie-hellman-group1-sha1 diffie-hellman-group14-sha1 diffie-hellman-group-exchange-sha1 diffie-hellman-group-exchange-sha256 ecdh-sha2-nistp256 ecdh-sha2-nistp384 ecdh-sha2-nistp521 ```
     Rationale: Key exchange methods that are considered weak should be removed. A key exchange method may be weak because too few bits are used, or the hashing algorithm is considered too weak. Using weak algorithms could expose connections to man-in-the-middle attacks
   module:
 
 - name: |
     Control-ID: 5.2.16
     Title: Ensure SSH Idle Timeout Interval is configured
-    Description: The two options `ClientAliveInterval` and `ClientAliveCountMax` control the timeout of ssh sessions.
-- `ClientAliveInterval` sets a timeout interval in seconds after which if no data has been received from the client, sshd will send a message through the encrypted channel to request a response from the client. The default is 0, indicating that these messages will not be sent to the client.
-- `ClientAliveCountMax` sets the number of client alive messages which may be sent without sshd receiving any messages back from the client. If this threshold is reached while client alive messages are being sent, sshd will disconnect the client, terminating the session. The default value is `3`.
- - The client alive messages are sent through the encrypted channel
- - Setting `ClientAliveCountMax` to `0` disables connection termination
-
-_Example:_ 
-If the `ClientAliveInterval` is set to 15 seconds and the `ClientAliveCountMax` is set to 3, the client `ssh` session will be terminated after 45 seconds of idle time.
-    Rationale: Having no timeout value associated with a connection could allow an unauthorized user access to another user's `ssh` session (e.g. user walks away from their computer and doesn't lock the screen). Setting a timeout value reduces this risk.
-- The recommended `ClientAliveInterval` setting is `300` seconds (5 minutes)
-- The recommended `ClientAliveCountMax` setting is `3`
-- The ssh session would send three keep alive messages at 5 minute intervals. If no response is received after the third keep alive message, the ssh session would be terminated after 15 minutes.
+    Description: The two options `ClientAliveInterval` and `ClientAliveCountMax` control the timeout of ssh sessions. - `ClientAliveInterval` sets a timeout interval in seconds after which if no data has been received from the client, sshd will send a message through the encrypted channel to request a response from the client. The default is 0, indicating that these messages will not be sent to the client. - `ClientAliveCountMax` sets the number of client alive messages which may be sent without sshd receiving any messages back from the client. If this threshold is reached while client alive messages are being sent, sshd will disconnect the client, terminating the session. The default value is `3`.  - The client alive messages are sent through the encrypted channel  - Setting `ClientAliveCountMax` to `0` disables connection termination  _Example:_  If the `ClientAliveInterval` is set to 15 seconds and the `ClientAliveCountMax` is set to 3, the client `ssh` session will be terminated after 45 seconds of idle time.
+    Rationale: Having no timeout value associated with a connection could allow an unauthorized user access to another user's `ssh` session (e.g. user walks away from their computer and doesn't lock the screen). Setting a timeout value reduces this risk. - The recommended `ClientAliveInterval` setting is `300` seconds (5 minutes) - The recommended `ClientAliveCountMax` setting is `3` - The ssh session would send three keep alive messages at 5 minute intervals. If no response is received after the third keep alive message, the ssh session would be terminated after 15 minutes.
   module:
 
 - name: |
@@ -1496,101 +1149,36 @@ If the `ClientAliveInterval` is set to 15 seconds and the `ClientAliveCountMax` 
 - name: |
     Control-ID: 5.3.1
     Title: Ensure password creation requirements are configured
-    Description: The `pam_pwquality.so` module checks the strength of passwords. It performs checks such as making sure a password is not a dictionary word, it is a certain length, contains a mix of characters (e.g. alphabet, numeric, other) and more. The following are definitions of the `pam_pwquality.so` options.
-
-The following options are set in the `/etc/security/pwquality.conf` file:
-
-Password Length:
-- `minlen = 14` - password must be 14 characters or more
-
-Password complexity:
-- `minclass = 4` - The minimum number of required classes of characters for the new password (digits, uppercase, lowercase, others)
-
- _OR_
-
-- `dcredit = -1` - provide at least one digit
-- `ucredit = -1` - provide at least one uppercase character
-- `ocredit = -1` - provide at least one special character
-- `lcredit = -1` - provide at least one lowercase character
-
-The following is set in the `/etc/pam.d/password-auth` and `/etc/pam.d/system-auth` files
-- `try_first_pass` - retrieve the password from a previous stacked PAM module. If not available, then prompt the user for a password.
-- `retry=3` - Allow 3 tries before sending back a failure.
-
-The settings shown above are one possible policy. Alter these values to conform to your own organization's password policies.
-
-_Notes:_
-- _Settings in `/etc/security/pwquality.conf` must use spaces around the `=` symbol._
-- _Additional modules options may be set in the `/etc/pam.d/password-auth` and `/etc/pam.d/system-auth` files_
+    Description: The `pam_pwquality.so` module checks the strength of passwords. It performs checks such as making sure a password is not a dictionary word, it is a certain length, contains a mix of characters (e.g. alphabet, numeric, other) and more. The following are definitions of the `pam_pwquality.so` options.  The following options are set in the `/etc/security/pwquality.conf` file:  Password Length: - `minlen = 14` - password must be 14 characters or more  Password complexity: - `minclass = 4` - The minimum number of required classes of characters for the new password (digits, uppercase, lowercase, others)   _OR_  - `dcredit = -1` - provide at least one digit - `ucredit = -1` - provide at least one uppercase character - `ocredit = -1` - provide at least one special character - `lcredit = -1` - provide at least one lowercase character  The following is set in the `/etc/pam.d/password-auth` and `/etc/pam.d/system-auth` files - `try_first_pass` - retrieve the password from a previous stacked PAM module. If not available, then prompt the user for a password. - `retry=3` - Allow 3 tries before sending back a failure.  The settings shown above are one possible policy. Alter these values to conform to your own organization's password policies.  _Notes:_ - _Settings in `/etc/security/pwquality.conf` must use spaces around the `=` symbol._ - _Additional modules options may be set in the `/etc/pam.d/password-auth` and `/etc/pam.d/system-auth` files_
     Rationale: Strong passwords and limited attempts before locking an account protect systems from being hacked through brute force methods.
   module:
 
 - name: |
     Control-ID: 5.3.2
     Title: Ensure lockout for failed password attempts is configured
-    Description: Lock out users after _n_ unsuccessful consecutive login attempts. 
-
-These settings are commonly configured with the `pam_faillock.so` module. Some environments may continue using the `pam_tally2.so` module, where this older method may simplify automation in mixed environments.
-
-Set the lockout number in `deny=` to the policy in effect at your site.
-
-`unlock_time=_n_` is the number of seconds the account remains locked after the number of attempts configured in `deny=_n_` has been met.
-
-_Notes:_
-- _Additional module options may be set, recommendation only covers those listed here._
-- _When modifying authentication configuration using the authconfig utility, the system-auth and password-auth files are overwritten with the settings from the authconfig utility. This can be avoided by creating symbolic links in place of the configuration files, which authconfig recognizes and does not overwrite. These symbolic links are the default for Fedora 19 derived distributions._
-- _Use of the "audit" keyword may log credentials in the case of user error during authentication. This risk should be evaluated in the context of the site policies of your organization._
-- _If a user has been locked out because they have reached the maximum consecutive failure count defined by `deny=` in the `pam_faillock.so` or the `pam_tally2.so` module, the user can be unlocked by issuing following commands. This command sets the failed count to 0, effectively unlocking the user._
- - _If `pam_faillock.so` is used:_ 
- ```
- # faillock --user <username> --reset
- ```
- - _If `pam_tally2.so` is used:_ 
- ```
- # pam_tally2 -u <username> --reset
- ```
+    Description: Lock out users after _n_ unsuccessful consecutive login attempts.   These settings are commonly configured with the `pam_faillock.so` module. Some environments may continue using the `pam_tally2.so` module, where this older method may simplify automation in mixed environments.  Set the lockout number in `deny=` to the policy in effect at your site.  `unlock_time=_n_` is the number of seconds the account remains locked after the number of attempts configured in `deny=_n_` has been met.  _Notes:_ - _Additional module options may be set, recommendation only covers those listed here._ - _When modifying authentication configuration using the authconfig utility, the system-auth and password-auth files are overwritten with the settings from the authconfig utility. This can be avoided by creating symbolic links in place of the configuration files, which authconfig recognizes and does not overwrite. These symbolic links are the default for Fedora 19 derived distributions._ - _Use of the "audit" keyword may log credentials in the case of user error during authentication. This risk should be evaluated in the context of the site policies of your organization._ - _If a user has been locked out because they have reached the maximum consecutive failure count defined by `deny=` in the `pam_faillock.so` or the `pam_tally2.so` module, the user can be unlocked by issuing following commands. This command sets the failed count to 0, effectively unlocking the user._  - _If `pam_faillock.so` is used:_   ```  # faillock --user <username> --reset  ```  - _If `pam_tally2.so` is used:_   ```  # pam_tally2 -u <username> --reset  ```
     Rationale: Locking out user IDs after _n_ unsuccessful consecutive login attempts mitigates brute force password attacks against your systems.
   module:
 
 - name: |
     Control-ID: 5.3.3
     Title: Ensure password hashing algorithm is SHA-512
-    Description: The commands below change password encryption from `md5` to `sha512` (a much stronger hashing algorithm). All existing accounts will need to perform a password change to upgrade the stored hashes to the new algorithm.
-
-_Notes:_
-- _These changes only apply to accounts configured on the local system._
-- _Additional module options may be set, recommendation only covers those listed here._
+    Description: The commands below change password encryption from `md5` to `sha512` (a much stronger hashing algorithm). All existing accounts will need to perform a password change to upgrade the stored hashes to the new algorithm.  _Notes:_ - _These changes only apply to accounts configured on the local system._ - _Additional module options may be set, recommendation only covers those listed here._
     Rationale: The SHA-512 algorithm provides much stronger hashing than MD5, thus providing additional protection to the system by increasing the level of effort for an attacker to successfully determine passwords.
   module:
 
 - name: |
     Control-ID: 5.3.4
     Title: Ensure password reuse is limited
-    Description: The `/etc/security/opasswd` file stores the users' old passwords and can be checked to ensure that users are not recycling recent passwords.
-
-_Notes:_
-- _Additional module options may be set, recommendation only covers those listed here._
-- _This setting only applies to local accounts._
-- _This option is configured with the remember=_n_ module option in `/etc/pam.d/system-auth` and `/etc/pam.d/password-auth`_
-- _This option can be set with either **one** of the two following modules:_
- - _`pam_pwhistory.so` - This is the newer and more common method._
- - _`pam_unix.so` - This is the _older_ method._
+    Description: The `/etc/security/opasswd` file stores the users' old passwords and can be checked to ensure that users are not recycling recent passwords.  _Notes:_ - _Additional module options may be set, recommendation only covers those listed here._ - _This setting only applies to local accounts._ - _This option is configured with the remember=_n_ module option in `/etc/pam.d/system-auth` and `/etc/pam.d/password-auth`_ - _This option can be set with either **one** of the two following modules:_  - _`pam_pwhistory.so` - This is the newer and more common method._  - _`pam_unix.so` - This is the _older_ method._
     Rationale: Forcing users not to reuse their past 5 passwords make it less likely that an attacker will be able to guess the password.
   module:
 
 - name: |
     Control-ID: 5.4.1.1
     Title: Ensure password expiration is 365 days or less
-    Description: The `PASS_MAX_DAYS` parameter in `/etc/login.defs` allows an administrator to force passwords to expire once they reach a defined age. It is recommended that the `PASS_MAX_DAYS` parameter be set to less than or equal to 365 days.
-
-_Notes:_
-- _A value of `-1` will disable password expiration._
-- _The password expiration must be greater than the minimum days between password changes or users will be unable to change their password._
-    Rationale: The window of opportunity for an attacker to leverage compromised credentials via a brute force attack, using already compromised credentials, or gaining the credentials by other means, can be limited by the age of the password. Therefore, reducing the maximum age of a password can also reduce an attacker's window of opportunity.
-
-Requiring passwords to be changed helps to mitigate the risk posed by the poor security practice of passwords being used for multiple accounts, and poorly implemented off-boarding and change of responsibility policies. This should **not** be considered a replacement for proper implementation of these policies and practices.
-
-_Note: If it is believed that a user's password may have been compromised, the user's account should be locked immediately. Local policy should be followed to ensure the secure update of their password._
+    Description: The `PASS_MAX_DAYS` parameter in `/etc/login.defs` allows an administrator to force passwords to expire once they reach a defined age. It is recommended that the `PASS_MAX_DAYS` parameter be set to less than or equal to 365 days.  _Notes:_ - _A value of `-1` will disable password expiration._ - _The password expiration must be greater than the minimum days between password changes or users will be unable to change their password._
+    Rationale: The window of opportunity for an attacker to leverage compromised credentials via a brute force attack, using already compromised credentials, or gaining the credentials by other means, can be limited by the age of the password. Therefore, reducing the maximum age of a password can also reduce an attacker's window of opportunity.  Requiring passwords to be changed helps to mitigate the risk posed by the poor security practice of passwords being used for multiple accounts, and poorly implemented off-boarding and change of responsibility policies. This should **not** be considered a replacement for proper implementation of these policies and practices.  _Note: If it is believed that a user's password may have been compromised, the user's account should be locked immediately. Local policy should be followed to ensure the secure update of their password._
   module:
 
 - name: |
@@ -1610,9 +1198,7 @@ _Note: If it is believed that a user's password may have been compromised, the u
 - name: |
     Control-ID: 5.4.1.4
     Title: Ensure inactive password lock is 30 days or less
-    Description: User accounts that have been inactive for over a given period of time can be automatically disabled. It is recommended that accounts that are inactive for 30 days after password expiration be disabled.
-
-**Note:** A value of `-1` would disable this setting.
+    Description: User accounts that have been inactive for over a given period of time can be automatically disabled. It is recommended that accounts that are inactive for 30 days after password expiration be disabled.  **Note:** A value of `-1` would disable this setting.
     Rationale: Inactive accounts pose a threat to system security since the users are not logging in to notice failed login attempts or other anomalies.
   module:
 
@@ -1627,9 +1213,7 @@ _Note: If it is believed that a user's password may have been compromised, the u
     Control-ID: 5.4.2
     Title: Ensure system accounts are secured
     Description: There are a number of accounts provided with most distributions that are used to manage applications and are not intended to provide an interactive shell.
-    Rationale: It is important to make sure that accounts that are not being used by regular users are prevented from being used to provide an interactive shell. By default, most distributions set the password field for these accounts to an invalid string, but it is also recommended that the shell field in the password file be set to the `nologin` shell. This prevents the account from potentially being used to run any commands.
-
-_Note: The `root`, `sync`, `shutdown`, and `halt` users are exempted from requiring a non-login shell._
+    Rationale: It is important to make sure that accounts that are not being used by regular users are prevented from being used to provide an interactive shell. By default, most distributions set the password field for these accounts to an invalid string, but it is also recommended that the shell field in the password file be set to the `nologin` shell. This prevents the account from potentially being used to run any commands.  _Note: The `root`, `sync`, `shutdown`, and `halt` users are exempted from requiring a non-login shell._
   module:
 
 - name: |
@@ -1642,47 +1226,15 @@ _Note: The `root`, `sync`, `shutdown`, and `halt` users are exempted from requir
 - name: |
     Control-ID: 5.4.4
     Title: Ensure default user shell timeout is configured
-    Description: `TMOUT` is an environmental setting that determines the timeout of a shell in seconds.
-- TMOUT=_n_ - Sets the shell timeout to _n_ seconds. A setting of `TMOUT=0` disables timeout.
-- readonly TMOUT- Sets the TMOUT environmental variable as readonly, preventing unwanted modification during run-time.
-- export TMOUT - exports the TMOUT variable 
-
-System Wide Shell Configuration Files:
-- `/etc/profile` - used to set system wide environmental variables on users shells. The variables are sometimes the same ones that are in the `.bash_profile`, however this file is used to set an initial PATH or PS1 for all shell users of the system. **is only executed for interactive *login* shells, or shells executed with the --login parameter.** 
-- `/etc/profile.d` - `/etc/profile` will execute the scripts within `/etc/profile.d/*.sh`. It is recommended to place your configuration in a shell script within `/etc/profile.d` to set your own system wide environmental variables.
-- `/etc/bashrc` - System wide version of `.bashrc`. In Fedora derived distributions, `etc/bashrc` also invokes /etc/profile.d/*.sh if *non-login* shell, but redirects output to `/dev/null` if *non-interactive.* **Is only executed for *interactive* shells or if `BASH_ENV` is set to `/etc/bashrc`.**
-    Rationale: Setting a timeout value reduces the window of opportunity for unauthorized user access to another user's shell session that has been left unattended. It also ends the inactive session and releases the resources associated with that session.
-
-_Notes:_
-- _The audit and remediation in this recommendation apply to bash and shell. If other shells are supported on the system, it is recommended that their configuration files are also checked. Other methods of setting a timeout exist for other shells not covered here._
-- _Ensure that the timeout conforms to your local policy._
+    Description: `TMOUT` is an environmental setting that determines the timeout of a shell in seconds. - TMOUT=_n_ - Sets the shell timeout to _n_ seconds. A setting of `TMOUT=0` disables timeout. - readonly TMOUT- Sets the TMOUT environmental variable as readonly, preventing unwanted modification during run-time. - export TMOUT - exports the TMOUT variable   System Wide Shell Configuration Files: - `/etc/profile` - used to set system wide environmental variables on users shells. The variables are sometimes the same ones that are in the `.bash_profile`, however this file is used to set an initial PATH or PS1 for all shell users of the system. **is only executed for interactive *login* shells, or shells executed with the --login parameter.**  - `/etc/profile.d` - `/etc/profile` will execute the scripts within `/etc/profile.d/*.sh`. It is recommended to place your configuration in a shell script within `/etc/profile.d` to set your own system wide environmental variables. - `/etc/bashrc` - System wide version of `.bashrc`. In Fedora derived distributions, `etc/bashrc` also invokes /etc/profile.d/*.sh if *non-login* shell, but redirects output to `/dev/null` if *non-interactive.* **Is only executed for *interactive* shells or if `BASH_ENV` is set to `/etc/bashrc`.**
+    Rationale: Setting a timeout value reduces the window of opportunity for unauthorized user access to another user's shell session that has been left unattended. It also ends the inactive session and releases the resources associated with that session.  _Notes:_ - _The audit and remediation in this recommendation apply to bash and shell. If other shells are supported on the system, it is recommended that their configuration files are also checked. Other methods of setting a timeout exist for other shells not covered here._ - _Ensure that the timeout conforms to your local policy._
   module:
 
 - name: |
     Control-ID: 5.4.5
     Title: Ensure default user umask is configured
-    Description: The user file-creation mode mask (`umask`) is use to determine the file permission for newly created directories and files. In Linux, the default permissions for any newly created directory is 0777 (rwxrwxrwx), and for any newly created file it is 0666 (rw-rw-rw-). The `umask` modifies the default Linux permissions by restricting (masking) these permissions. The `umask` is not simply subtracted, but is processed bitwise. Bits set in the `umask` are cleared in the resulting file mode.
-
-**`umask` can be set with either `octal` or `Symbolic` values**
-- `Octal` (Numeric) Value - Represented by either three or four digits. ie `umask 0027` or `umask 027`. If a four digit umask is used, the first digit is ignored. The remaining three digits effect the resulting permissions for user, group, and world/other respectively.
-- `Symbolic` Value - Represented by a comma separated list for User `u`, group `g`, and world/other `o`. The permissions listed are not masked by `umask`. ie a `umask` set by `umask u=rwx,g=rx,o=` is the `Symbolic` equivalent of the `Octal` `umask 027`. This `umask` would set a newly created directory with file mode `drwxr-x---` and a newly created file with file mode `rw-r-----`.
-
-The default `umask` is set in a `System Wide Shell Configuration File`. The user creating the directories or files has the discretion of changing the permissions via the chmod command, or choosing a different default `umask` by adding the `umask` command into a `User Shell Configuration File`, ( `.bash_profile` or `.bashrc`), in their home directory.
-
-System Wide Shell Configuration Files:
-- `/etc/profile` - used to set system wide environmental variables on users shells. The variables are sometimes the same ones that are in the `.bash_profile`, however this file is used to set an initial PATH or PS1 for all shell users of the system. **is only executed for interactive *login* shells, or shells executed with the --login parameter.** 
-- `/etc/profile.d` - `/etc/profile` will execute the scripts within `/etc/profile.d/*.sh`. It is recommended to place your configuration in a shell script within `/etc/profile.d` to set your own system wide environmental variables.
-- `/etc/bashrc` - System wide version of `.bashrc`. In Fedora derived distributions, `etc/bashrc` also invokes /etc/profile.d/*.sh if *non-login* shell, but redirects output to `/dev/null` if *non-interactive.* **Is only executed for *interactive* shells or if `BASH_ENV` is set to `/etc/bashrc`.**
-
-User Shell Configuration Files:
-- `~/.bash_profile` - Is executed to configure your shell before the initial command prompt. **Is only read by login shells.**
-- `~/.bashrc` - Is executed for interactive shells. **only read by a shell that's both interactive and non-login**
-    Rationale: Setting a secure default value for `umask` ensures that users make a conscious choice about their file permissions. A permissive `umask` value could result in directories or files with excessive permissions that can be read and/or written to by unauthorized users.
-
-_Notes:_
-- _The audit and remediation in this recommendation apply to bash and shell. If other shells are supported on the system, it is recommended that their configuration files also are checked._
-- _Other methods of setting a default user `umask` exist however the shell configuration files are the last run and will override other settings if they exist, therefor our recommendation is to configure in the shell configuration files._ 
-- _If other methods are in use in your environment they should be audited and the shell configs should be verified to not override._
+    Description: The user file-creation mode mask (`umask`) is use to determine the file permission for newly created directories and files. In Linux, the default permissions for any newly created directory is 0777 (rwxrwxrwx), and for any newly created file it is 0666 (rw-rw-rw-). The `umask` modifies the default Linux permissions by restricting (masking) these permissions. The `umask` is not simply subtracted, but is processed bitwise. Bits set in the `umask` are cleared in the resulting file mode.  **`umask` can be set with either `octal` or `Symbolic` values** - `Octal` (Numeric) Value - Represented by either three or four digits. ie `umask 0027` or `umask 027`. If a four digit umask is used, the first digit is ignored. The remaining three digits effect the resulting permissions for user, group, and world/other respectively. - `Symbolic` Value - Represented by a comma separated list for User `u`, group `g`, and world/other `o`. The permissions listed are not masked by `umask`. ie a `umask` set by `umask u=rwx,g=rx,o=` is the `Symbolic` equivalent of the `Octal` `umask 027`. This `umask` would set a newly created directory with file mode `drwxr-x---` and a newly created file with file mode `rw-r-----`.  The default `umask` is set in a `System Wide Shell Configuration File`. The user creating the directories or files has the discretion of changing the permissions via the chmod command, or choosing a different default `umask` by adding the `umask` command into a `User Shell Configuration File`, ( `.bash_profile` or `.bashrc`), in their home directory.  System Wide Shell Configuration Files: - `/etc/profile` - used to set system wide environmental variables on users shells. The variables are sometimes the same ones that are in the `.bash_profile`, however this file is used to set an initial PATH or PS1 for all shell users of the system. **is only executed for interactive *login* shells, or shells executed with the --login parameter.**  - `/etc/profile.d` - `/etc/profile` will execute the scripts within `/etc/profile.d/*.sh`. It is recommended to place your configuration in a shell script within `/etc/profile.d` to set your own system wide environmental variables. - `/etc/bashrc` - System wide version of `.bashrc`. In Fedora derived distributions, `etc/bashrc` also invokes /etc/profile.d/*.sh if *non-login* shell, but redirects output to `/dev/null` if *non-interactive.* **Is only executed for *interactive* shells or if `BASH_ENV` is set to `/etc/bashrc`.**  User Shell Configuration Files: - `~/.bash_profile` - Is executed to configure your shell before the initial command prompt. **Is only read by login shells.** - `~/.bashrc` - Is executed for interactive shells. **only read by a shell that's both interactive and non-login**
+    Rationale: Setting a secure default value for `umask` ensures that users make a conscious choice about their file permissions. A permissive `umask` value could result in directories or files with excessive permissions that can be read and/or written to by unauthorized users.  _Notes:_ - _The audit and remediation in this recommendation apply to bash and shell. If other shells are supported on the system, it is recommended that their configuration files also are checked._ - _Other methods of setting a default user `umask` exist however the shell configuration files are the last run and will override other settings if they exist, therefor our recommendation is to configure in the shell configuration files._  - _If other methods are in use in your environment they should be audited and the shell configs should be verified to not override._
   module:
 
 - name: |
@@ -1794,11 +1346,7 @@ _Notes:_
     Control-ID: 6.2.1
     Title: Ensure accounts in /etc/passwd use shadowed passwords
     Description: Local accounts can uses shadowed passwords. With shadowed passwords, The passwords are saved in shadow password file, `/etc/shadow`, encrypted by a salted one-way hash. Accounts with a shadowed password have an `x` in the second field in `/etc/passwd`.
-    Rationale: The `/etc/passwd` file also contains information like user ID's and group ID's that are used by many system programs. Therefore, the `/etc/passwd` file must remain world readable. In spite of encoding the password with a randomly-generated one-way hash function, an attacker could still break the system if they got access to the `/etc/passwd` file. This can be mitigated by using shadowed passwords, thus moving the passwords in the `/etc/passwd` file to `/etc/shadow`. The `/etc/shadow` file is set so only root will be able to read and write. This helps mitigate the risk of an attacker gaining access to the encoded passwords with which to perform a dictionary attack. 
-
-_Notes:_
-- _All accounts must have passwords or be locked to prevent the account from being used by an unauthorized user._ 
-- _A user account with an empty second field in `/etc/passwd` allows the account to be logged into by providing only the username._
+    Rationale: The `/etc/passwd` file also contains information like user ID's and group ID's that are used by many system programs. Therefore, the `/etc/passwd` file must remain world readable. In spite of encoding the password with a randomly-generated one-way hash function, an attacker could still break the system if they got access to the `/etc/passwd` file. This can be mitigated by using shadowed passwords, thus moving the passwords in the `/etc/passwd` file to `/etc/shadow`. The `/etc/shadow` file is set so only root will be able to read and write. This helps mitigate the risk of an attacker gaining access to the encoded passwords with which to perform a dictionary attack.   _Notes:_ - _All accounts must have passwords or be locked to prevent the account from being used by an unauthorized user._  - _A user account with an empty second field in `/etc/passwd` allows the account to be logged into by providing only the username._
   module:
 
 - name: |
@@ -1868,9 +1416,7 @@ _Notes:_
     Control-ID: 6.2.11
     Title: Ensure users' .netrc Files are not group or world accessible
     Description: While the system administrator can establish secure permissions for users' `.netrc` files, the users can easily override these.
-    Rationale: `.netrc` files may contain unencrypted passwords that may be used to attack other systems.
-
-_Note: While the complete removal of .netrc files is recommended if any are required on the system secure permissions must be applied._
+    Rationale: `.netrc` files may contain unencrypted passwords that may be used to attack other systems.  _Note: While the complete removal of .netrc files is recommended if any are required on the system secure permissions must be applied._
   module:
 
 - name: |
@@ -1897,9 +1443,7 @@ _Note: While the complete removal of .netrc files is recommended if any are requ
 - name: |
     Control-ID: 6.2.15
     Title: Ensure no duplicate GIDs exist
-    Description: Although the `groupadd` program will not let you create a duplicate Group ID (GID), it is possible for an administrator to manually edit the `/etc/group` file and change the GID field.
-
-**Note:** You can also use the `grpck` command to check for other inconsistencies in the `/etc/group` file.
+    Description: Although the `groupadd` program will not let you create a duplicate Group ID (GID), it is possible for an administrator to manually edit the `/etc/group` file and change the GID field.  **Note:** You can also use the `grpck` command to check for other inconsistencies in the `/etc/group` file.
     Rationale: User groups must be assigned unique GIDs for accountability and to ensure appropriate access protections.
   module:
 

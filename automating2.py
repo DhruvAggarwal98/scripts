@@ -18,8 +18,8 @@ for index,row in df.iterrows():
         if type(control_id) == str:
             fileout.write("- name: |\n")
             title = row["title"]
-            desc = row["description"]
-            rationale = row["rationale statement"]
+            desc = row["description"].replace("\n"," ")
+            rationale = row["rationale statement"].replace("\n"," ")
             fileout.write("    Control-ID: "+control_id)
             fileout.write("\n")
             fileout.write("    Title: "+title)
